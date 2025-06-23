@@ -188,7 +188,7 @@ namespace Unity.HLODSystem
 
                 Bounds bounds = hlod.GetBounds();
 
-                List<GameObject> hlodTargets = ObjectUtils.HLODTargets(hlod.gameObject);
+                List<GameObject> hlodTargets = ObjectUtils.HLODTargets(hlod.gameObject, hlod.TagFilter);
                 ISpaceSplitter spliter = SpaceSplitterTypes.CreateInstance(hlod);
                 if (spliter == null)
                 {

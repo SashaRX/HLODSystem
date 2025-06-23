@@ -21,6 +21,8 @@ namespace Unity.HLODSystem
         private float m_CullDistance = 0.01f;
         [SerializeField]
         private float m_MinObjectSize = 0.0f;
+        [SerializeField]
+        private string m_TagFilter = "";
 
         private Type m_SpaceSplitterType;
         private Type m_BatcherType;
@@ -124,6 +126,12 @@ namespace Unity.HLODSystem
         {
             set { m_MinObjectSize = value; }
             get { return m_MinObjectSize; }
+        }
+
+        public string TagFilter
+        {
+            get { return m_TagFilter; }
+            set { m_TagFilter = value; }
         }
 
         

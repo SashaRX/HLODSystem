@@ -33,7 +33,7 @@ namespace Unity.HLODSystem.Utils
             return result.ToList();
         }
 
-        public static List<GameObject> HLODTargets(GameObject root)
+        public static List<GameObject> HLODTargets(GameObject root, string tagFilter = null)
         {
             List<GameObject> targets = new List<GameObject>();
 
@@ -87,7 +87,13 @@ namespace Unity.HLODSystem.Utils
                 targetsByPrefab.Add(targetPrefab);
             }
 
-            return targetsByPrefab.ToList();
+            List<GameObject> results = targetsByPrefab.ToList();
+            if (string.IsNullOrEmpty(tagFilter) == false)
+            {
+                results = results.Where(t => t.CompareTag(tagFilter)).ToList();
+            }
+
+            return results;
         }
 
         //This is finding nearest prefab root from the HLODRoot.
