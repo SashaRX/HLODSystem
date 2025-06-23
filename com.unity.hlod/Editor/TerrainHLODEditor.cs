@@ -188,7 +188,7 @@ namespace Unity.HLODSystem
                 //EditorGUILayout.
                 if (mat == null)
                 {
-                    mat = new Material(Shader.Find("Standard"));
+                    mat = new Material(Shader.Find("Universal Render Pipeline/Simple Lit"));
                 }
 
                 string[] outputTexturePropertyNames = mat.GetTexturePropertyNames();

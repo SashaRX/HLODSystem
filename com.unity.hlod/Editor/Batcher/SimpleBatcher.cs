@@ -263,7 +263,7 @@ namespace Unity.HLODSystem
 
             if (material == null)
             {
-                material = new WorkingMaterial(Allocator.Persistent, new Material(Shader.Find("Standard")));
+                material = new WorkingMaterial(Allocator.Persistent, new Material(Shader.Find("Universal Render Pipeline/Simple Lit")));
             }
             
             foreach (var texture in textures)
@@ -462,7 +462,7 @@ namespace Unity.HLODSystem
             }
             mat = EditorGUILayout.ObjectField("Material", mat, typeof(Material), false) as Material;
             if( mat == null)
-                mat = new Material(Shader.Find("Standard"));
+                mat = new Material(Shader.Find("Universal Render Pipeline/Simple Lit"));
             
             path = AssetDatabase.GetAssetPath(mat);
             matGUID = AssetDatabase.AssetPathToGUID(path);

@@ -275,7 +275,7 @@ namespace Unity.HLODSystem
             {
                 if (string.IsNullOrEmpty(m_assetGuid))
                 {
-                    Material mat = new Material(Shader.Find("Standard"));
+                    Material mat = new Material(Shader.Find("Universal Render Pipeline/Simple Lit"));
                     EditorJsonUtility.FromJsonOverwrite(m_jsonData, mat);
                     mat.name = m_name;
                     return mat;
