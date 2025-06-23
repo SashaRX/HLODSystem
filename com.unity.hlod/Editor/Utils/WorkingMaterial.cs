@@ -340,7 +340,7 @@ namespace Unity.HLODSystem.Utils
             
             if (mat == null)
             {
-                return new Material(Shader.Find("Standard"));
+                return new Material(Shader.Find("Universal Render Pipeline/Simple Lit"));
             }
 
             return mat;

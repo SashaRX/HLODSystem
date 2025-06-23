@@ -28,7 +28,7 @@ source textures are copied to the generated texture atlas, HLOD system
 will try to reduce the size of the generated texture atlas.
 
 **Material**: Sets the material for the merged mesh. If not set, we'll
-use *Standard Shader*.
+use *Simple Lit Shader*.
 
 **Textures:** An entry X-Y here means we find all textures referenced
 as property X from materials used by meshes in the HLOD hierarchy,
