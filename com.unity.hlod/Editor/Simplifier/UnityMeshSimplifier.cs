@@ -5,36 +5,27 @@ using Unity.HLODSystem.Utils;
 using UnityEditor;
 using UnityEngine;
 
-namespace Unity.HLODSystem.Simplifier
-{
-    public class UnityMeshSimplifier : SimplifierBase
-    {
-
+namespace Unity.HLODSystem.Simplifier{
+    public class UnityMeshSimplifier(SerializableDynamicObject simplifierOptions) : SimplifierBase(simplifierOptions), SimplifierBase{
         [InitializeOnLoadMethod]
-        static void RegisterType()
-        {
+        static void RegisterType(){
             SimplifierTypes.RegisterType(typeof(UnityMeshSimplifier));
         }
 
-        public UnityMeshSimplifier(SerializableDynamicObject simplifierOptions): base(simplifierOptions)
-        {
-        }
-
-        protected override IEnumerator GetSimplifiedMesh(Utils.WorkingMesh origin, float quality, Action<Utils.WorkingMesh> resultCallback)
-        {
-            var meshSimplifier = new global::UnityMeshSimplifier.MeshSimplifier();
-            meshSimplifier.Vertices = origin.vertices;
-            meshSimplifier.Normals = origin.normals;
-            meshSimplifier.Tangents = origin.tangents;
-            meshSimplifier.UV1 = origin.uv;
-            meshSimplifier.UV2 = origin.uv2;
-            meshSimplifier.UV3 = origin.uv3;
-            meshSimplifier.UV4 = origin.uv4;
-            meshSimplifier.Colors = origin.colors;
+        protected override IEnumerator GetSimplifiedMesh(Utils.WorkingMesh origin, float quality, Action<Utils.WorkingMesh> resultCallback){
+            var meshSimplifier = new global::UnityMeshSimplifier.MeshSimplifier{
+                Vertices = origin.vertices,
+                Normals = origin.normals,
+                Tangents = origin.tangents,
+                UV1 = origin.uv,
+                UV2 = origin.uv2,
+                UV3 = origin.uv3,
+                UV4 = origin.uv4,
+                Colors = origin.colors
+            };
 
             var triangles = new int[origin.subMeshCount][];
-            for (var submesh = 0; submesh < origin.subMeshCount; submesh++)
-            {
+            for (var submesh = 0; submesh < origin.subMeshCount; submesh++){
                 triangles[submesh] = origin.GetTriangles(submesh);
             }
 
@@ -43,8 +34,7 @@ namespace Unity.HLODSystem.Simplifier
             meshSimplifier.SimplifyMesh(quality);
 
             int triCount = 0;
-            for (int i = 0; i < meshSimplifier.SubMeshCount; ++i)
-            {
+            for (int i = 0; i < meshSimplifier.SubMeshCount; ++i){
                 triCount += meshSimplifier.GetSubMeshTriangles(i).Length;
             }
 
@@ -59,22 +49,15 @@ namespace Unity.HLODSystem.Simplifier
             nwm.uv4 = meshSimplifier.UV4;
             nwm.colors = meshSimplifier.Colors;
             nwm.subMeshCount = meshSimplifier.SubMeshCount;
-            for (var submesh = 0; submesh < nwm.subMeshCount; submesh++)
-            {
+            for (var submesh = 0; submesh < nwm.subMeshCount; submesh++){
                 nwm.SetTriangles(meshSimplifier.GetSubMeshTriangles(submesh), submesh);
             }
 
-            if (resultCallback != null)
-            {
-                resultCallback(nwm);
-            }
+            resultCallback?.Invoke(nwm);
             yield break;
         }
 
-        
-
-        public static void OnGUI(SerializableDynamicObject simplifierOptions)
-        {
+        public static void OnGUI(SerializableDynamicObject simplifierOptions){
             OnGUIBase(simplifierOptions);
         }
     }

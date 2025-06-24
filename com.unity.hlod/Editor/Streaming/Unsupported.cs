@@ -49,8 +49,8 @@ namespace Unity.HLODSystem.Streaming
                 }
             }
         }
-        
-        
+
+
         [InitializeOnLoadMethod]
         static void RegisterType()
         {
@@ -68,7 +68,7 @@ namespace Unity.HLODSystem.Streaming
             m_controllerID = controllerID;
         }
 
-        public void Build(SpaceNode rootNode, DisposableList<HLODBuildInfo> infos, GameObject root, 
+        public void Build(SpaceNode rootNode, DisposableList<HLODBuildInfo> infos, GameObject root,
             float cullDistance, float lodDistance, bool writeNoPrefab, bool extractMaterial, Action<float> onProgress)
         {
             dynamic options = m_streamingOptions;
@@ -86,19 +86,19 @@ namespace Unity.HLODSystem.Streaming
             compressionData.AndroidTextureFormat = options.AndroidCompression;
             compressionData.iOSTextureFormat = options.iOSCompression;
             compressionData.tvOSTextureFormat = options.tvOSCompression;
-            
+
             string filename = $"{path}{root.name}.hlod";
 
             if (Directory.Exists(path) == false)
             {
                 Directory.CreateDirectory(path);
             }
-            
+
             using (Stream stream = new FileStream(filename, FileMode.Create))
             {
                 HLODData data = new HLODData();
                 data.CompressionData = compressionData;
-                
+
                 for (int i = 0; i < infos.Count; ++i)
                 {
                     data.AddFromWokringObjects(infos[i].Name, infos[i].WorkingObjects);
@@ -112,7 +112,7 @@ namespace Unity.HLODSystem.Streaming
                     for (int ii = 0; ii < infos.Count; ++ii)
                     {
                         var spaceNode = infos[ii].Target;
-                        
+
                         for (int oi = 0; oi < spaceNode.Objects.Count; ++oi)
                         {
                             if (PrefabUtility.IsAnyPrefabInstanceRoot(spaceNode.Objects[oi]) == false)
@@ -127,18 +127,18 @@ namespace Unity.HLODSystem.Streaming
                 {
                     ExtractMaterial(data, $"{path}{root.name}");
                 }
-                
+
                 HLODDataSerializer.Write(stream, data);
             }
 
             AssetDatabase.ImportAsset(filename, ImportAssetOptions.ForceUpdate);
             RootData rootData = AssetDatabase.LoadAssetAtPath<RootData>(filename);
             m_manager.AddGeneratedResource(rootData);
-       
+
             var defaultController = root.AddComponent<DefaultHLODController>();
             defaultController.ControllerID = m_controllerID;
             m_manager.AddGeneratedResource(defaultController);
-            
+
             GameObject hlodRoot = new GameObject("HLODRoot");
             hlodRoot.transform.SetParent(root.transform, false);
             m_manager.AddGeneratedResource(hlodRoot);
@@ -167,7 +167,7 @@ namespace Unity.HLODSystem.Streaming
                             m_manager.AddGeneratedResource(go);
                         else
                             m_manager.AddConvertedPrefabResource(go);
-                        
+
                         Object.DestroyImmediate(obj);
                     }
                     else
@@ -175,7 +175,7 @@ namespace Unity.HLODSystem.Streaming
                         int highId = defaultController.AddHighObject(obj);
                         hlodTreeNode.HighObjectIds.Add(highId);
                     }
-                    
+
                 }
 
 
@@ -194,7 +194,7 @@ namespace Unity.HLODSystem.Streaming
                         int lowId = defaultController.AddLowObject(go);
                         hlodTreeNode.LowObjectIds.Add(lowId);
                         m_manager.AddGeneratedResource(go);
-                        
+
                     }
                 }
             }
@@ -203,7 +203,7 @@ namespace Unity.HLODSystem.Streaming
             defaultController.Root = convertedRootNode;
             defaultController.CullDistance = cullDistance;
             defaultController.LODDistance = lodDistance;
-            
+
             defaultController.UpdateMaxManualLevel();
         }
 
@@ -335,12 +335,11 @@ namespace Unity.HLODSystem.Streaming
         static bool showFormat = true;
         public static void OnGUI(SerializableDynamicObject streamingOptions)
         {
-            
+
             dynamic options = streamingOptions;
 
 #region Setup default values
-            if (options.OutputDirectory == null)
-            {
+            if (options.OutputDirectory == null){
                 string path = Application.dataPath;
                 path = "Assets" + path.Substring(Application.dataPath.Length);
                 path = path.Replace('\\', '/');
@@ -349,70 +348,59 @@ namespace Unity.HLODSystem.Streaming
                 options.OutputDirectory = path;
             }
 
-            if (options.PCCompression == null)
-            {
+            if (options.PCCompression == null){
                 options.PCCompression = TextureFormat.BC7;
             }
-            if (options.WebGLCompression == null)
-            {
+            if (options.WebGLCompression == null){
                 options.WebGLCompression = TextureFormat.DXT5;
             }
-            if (options.AndroidCompression == null)
-            {
+            if (options.AndroidCompression == null){
                 options.AndroidCompression = TextureFormat.ETC2_RGBA8;
             }
-            if (options.iOSCompression== null)
-            {
+            if (options.iOSCompression== null){
                 options.iOSCompression = TextureFormat.PVRTC_RGBA4;
             }
-            if (options.tvOSCompression == null)
-            {
+            if (options.tvOSCompression == null){
                 options.tvOSCompression = TextureFormat.ASTC_4x4;
             }
 #endregion
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.PrefixLabel("OutputDirectory");
-            if (GUILayout.Button(options.OutputDirectory))
-            {
+            if (GUILayout.Button(options.OutputDirectory)){
                 string selectPath = EditorUtility.OpenFolderPanel("Select output folder", "Assets", "");
 
-                if (selectPath.StartsWith(Application.dataPath))
-                {
+                if (selectPath.StartsWith(Application.dataPath)){
                     selectPath = "Assets" + selectPath.Substring(Application.dataPath.Length);
                     selectPath = selectPath.Replace('\\', '/');
                     if (selectPath.EndsWith("/") == false)
                         selectPath += "/";
                     options.OutputDirectory = selectPath;
-                }
-                else
-                {
+                }else{
                     EditorUtility.DisplayDialog("Error", $"Select directory under {Application.dataPath}", "OK");
                 }
             }
             EditorGUILayout.EndHorizontal();
 
-            if (showFormat = EditorGUILayout.Foldout(showFormat, "Compress Format"))
-            {
+            showFormat = EditorGUILayout.Toggle("Compress Format", showFormat);
+            if (showFormat){
                 EditorGUI.indentLevel += 1;
                 options.PCCompression = PopupFormat("PC & Console", (TextureFormat)options.PCCompression);
                 options.WebGLCompression = PopupFormat("WebGL", (TextureFormat)options.WebGLCompression);
                 options.AndroidCompression = PopupFormat("Android", (TextureFormat)options.AndroidCompression);
                 options.iOSCompression = PopupFormat("iOS", (TextureFormat)options.iOSCompression);
                 options.tvOSCompression = PopupFormat("tvOS", (TextureFormat)options.tvOSCompression);
-                EditorGUI.indentLevel -= 1;   
+                EditorGUI.indentLevel -= 1;
             }
 
         }
 
-        private static TextureFormat PopupFormat(string label, TextureFormat format)
-        {
+        private static TextureFormat PopupFormat(string label, TextureFormat format){
             int selectIndex = Array.IndexOf(Styles.SupportTextureFormats, format);
             selectIndex = EditorGUILayout.Popup(label, selectIndex, Styles.SupportTextureFormatStrings);
             if (selectIndex < 0)
                 selectIndex = 0;
             return Styles.SupportTextureFormats[selectIndex];
         }
-
     }
 }

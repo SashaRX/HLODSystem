@@ -53,46 +53,46 @@ namespace Unity.HLODSystem.Streaming
                 }
             }
         }
-        
+
         [InitializeOnLoadMethod]
         static void RegisterType()
         {
             StreamingBuilderTypes.RegisterType(typeof(AddressableStreaming));
         }
-        
+
         private IGeneratedResourceManager m_manager;
         private SerializableDynamicObject m_streamingOptions;
         private int m_controllerID;
 
         HashSet<string> m_shaderGuids = new HashSet<string>();
-        
+
         public AddressableStreaming(IGeneratedResourceManager manager, int controllerID, SerializableDynamicObject streamingOptions)
         {
             m_manager = manager;
             m_streamingOptions = streamingOptions;
             m_controllerID = controllerID;
         }
-        
-        public void Build(SpaceNode rootNode, DisposableList<HLODBuildInfo> infos, GameObject root, 
+
+        public void Build(SpaceNode rootNode, DisposableList<HLODBuildInfo> infos, GameObject root,
             float cullDistance, float lodDistance, bool writeNoPrefab, bool extractMaterial, Action<float> onProgress)
         {
             dynamic options = m_streamingOptions;
             string path = options.OutputDirectory;
-            
+
             HLODTreeNodeContainer container = new HLODTreeNodeContainer();
             HLODTreeNode convertedRootNode = ConvertNode(container, rootNode);
-            
+
             //create settings if there is no settings.
             if (AddressableAssetSettingsDefaultObject.Settings == null)
             {
                 AddressableAssetSettings.Create(AddressableAssetSettingsDefaultObject.kDefaultConfigFolder, AddressableAssetSettingsDefaultObject.kDefaultConfigAssetName, true, true);
             }
 
-            
+
             var settings = AddressableAssetSettingsDefaultObject.GetSettings(true);
             var group = GetGroup(settings, options.AddressablesGroupName);
             m_shaderGuids.Clear();
-            
+
             if (onProgress != null)
                 onProgress(0.0f);
 
@@ -105,12 +105,12 @@ namespace Unity.HLODSystem.Streaming
 
 
             string filenamePrefix = $"{path}{root.name}";
-            
+
             if (Directory.Exists(path) == false)
             {
                 Directory.CreateDirectory(path);
             }
-            
+
             Dictionary<int, HLODData> hlodDatas = new Dictionary<int, HLODData>();
 
             for (int i = 0; i < infos.Count; ++i)
@@ -156,7 +156,7 @@ namespace Unity.HLODSystem.Streaming
             if (extractMaterial)
             {
                 ExtractMaterial(hlodDatas, filenamePrefix);
-                
+
             }
 
             Dictionary<int, RootData> rootDatas = new Dictionary<int, RootData>();
@@ -168,16 +168,16 @@ namespace Unity.HLODSystem.Streaming
                     HLODDataSerializer.Write(stream, item.Value);
                     stream.Close();
                 }
-                
+
                 AssetDatabase.ImportAsset(filename, ImportAssetOptions.ForceUpdate);
                 RootData rootData = AssetDatabase.LoadAssetAtPath<RootData>(filename);
                 m_manager.AddGeneratedResource(rootData);
                 AddAddress(settings, group, rootData);
-                
+
                 rootDatas.Add(item.Key, rootData);
             }
 
-            
+
 
             var addressableController = root.AddComponent<AddressableHLODController>();
             addressableController.ControllerID = m_controllerID;
@@ -187,7 +187,7 @@ namespace Unity.HLODSystem.Streaming
             {
                 var spaceNode = infos[i].Target;
                 var hlodTreeNode = convertedTable[infos[i].Target];
-                
+
                 for (int oi = 0; oi < spaceNode.Objects.Count; ++oi)
                 {
                     int highId = -1;
@@ -198,7 +198,7 @@ namespace Unity.HLODSystem.Streaming
 
 
                         GameObject rootGameObject = null;
-                        
+
                         if ( rootDatas.ContainsKey(i))
                             rootGameObject = rootDatas[i].GetRootObject(obj.name);
 
@@ -228,7 +228,7 @@ namespace Unity.HLODSystem.Streaming
                         AddAddress(settings, group, spaceNode.Objects[oi]);
                         address = GetAddress(spaceNode.Objects[oi]);
                     }
-                    
+
                     if (address != null)
                     {
                         highId = addressableController.AddHighObject(address, spaceNode.Objects[oi]);
@@ -237,7 +237,7 @@ namespace Unity.HLODSystem.Streaming
                     {
                         highId = addressableController.AddHighObject(spaceNode.Objects[oi]);
                     }
-                    
+
                     hlodTreeNode.HighObjectIds.Add(highId);
                 }
 
@@ -246,7 +246,7 @@ namespace Unity.HLODSystem.Streaming
                     {
                         string filename = $"{filenamePrefix}_group{infos[i].ParentIndex}.hlod";
                         int lowId = addressableController.AddLowObject(filename + "[" + infos[i].Name + "]");
-                        hlodTreeNode.LowObjectIds.Add(lowId);    
+                        hlodTreeNode.LowObjectIds.Add(lowId);
                     }
 
                 }
@@ -265,7 +265,7 @@ namespace Unity.HLODSystem.Streaming
             addressableController.Root = convertedRootNode;
             addressableController.CullDistance = cullDistance;
             addressableController.LODDistance = lodDistance;
-            
+
             addressableController.UpdateMaxManualLevel();
         }
 
@@ -339,7 +339,7 @@ namespace Unity.HLODSystem.Streaming
             //apply to HLODData
             foreach(var hlodData in hlodDatas.Values)
             {
-                
+
                 var materials = hlodData.GetMaterials();
                 for ( int i = 0; i < materials.Count; ++i )
                 {
@@ -365,7 +365,7 @@ namespace Unity.HLODSystem.Streaming
 
             }
         }
-      
+
         Dictionary<SpaceNode, HLODTreeNode> convertedTable = new Dictionary<SpaceNode, HLODTreeNode>();
 
         private HLODTreeNode ConvertNode(HLODTreeNodeContainer container, SpaceNode rootNode)
@@ -412,8 +412,8 @@ namespace Unity.HLODSystem.Streaming
 
             return root;
         }
-     
-        
+
+
         static bool showFormat = true;
         public static void OnGUI(SerializableDynamicObject streamingOptions)
         {
@@ -486,11 +486,10 @@ namespace Unity.HLODSystem.Streaming
             EditorGUILayout.EndHorizontal();
 
             options.AddressablesGroupName = EditorGUILayout.TextField("Addressables Group", options.AddressablesGroupName);
-            
+
 
             // It stores return value from foldout and uses it as a condition.
-            if (showFormat = EditorGUILayout.Foldout(showFormat, "Compress Format"))
-            {
+            if (showFormat = EditorGUILayout.Foldout(showFormat, "Compress Format")){
                 EditorGUI.indentLevel += 1;
                 options.PCCompression = PopupFormat("PC & Console", (TextureFormat) options.PCCompression);
                 options.WebGLCompression = PopupFormat("WebGL", (TextureFormat) options.WebGLCompression);
@@ -500,7 +499,7 @@ namespace Unity.HLODSystem.Streaming
                 EditorGUI.indentLevel -= 1;
             }
         }
-        
+
         private static TextureFormat PopupFormat(string label, TextureFormat format)
         {
             int selectIndex = 0;
@@ -514,9 +513,9 @@ namespace Unity.HLODSystem.Streaming
 
         private void AddAddress(AddressableAssetSettings settings, AddressableAssetGroup group, Object obj)
         {
-            
+
             string path = GetAssetPath(obj);
-            
+
             if (string.IsNullOrEmpty(path))
                 return;
 
@@ -544,8 +543,8 @@ namespace Unity.HLODSystem.Streaming
 
             string guid = AssetDatabase.AssetPathToGUID(path);
             entriesAdded.Add(settings.CreateOrMoveEntry(guid, group, false, false));
-            
-            
+
+
 
             settings.SetDirty(AddressableAssetSettings.ModificationEvent.EntryMoved, entriesAdded, true);
         }
@@ -559,7 +558,7 @@ namespace Unity.HLODSystem.Streaming
 
             var settings = AddressableAssetSettingsDefaultObject.GetSettings(true);
             string path = GetAssetPath(obj);
-            
+
             if (string.IsNullOrEmpty(path))
                 return null;
 
@@ -580,7 +579,7 @@ namespace Unity.HLODSystem.Streaming
                 return address;
 
             }
-            
+
             return null;
         }
 
@@ -591,7 +590,7 @@ namespace Unity.HLODSystem.Streaming
             if (string.IsNullOrEmpty(path) && PrefabUtility.GetPrefabInstanceStatus(obj) == PrefabInstanceStatus.Connected)
             {
                 Object prefab = PrefabUtility.GetCorrespondingObjectFromOriginalSource(obj);
-                path = AssetDatabase.GetAssetPath(prefab);   
+                path = AssetDatabase.GetAssetPath(prefab);
             }
 
             return path;
@@ -624,14 +623,14 @@ namespace Unity.HLODSystem.Streaming
                 if (settings.groups[i].Name == groupName)
                     return settings.groups[i];
             }
-            
+
             List<AddressableAssetGroupSchema> schemas = new List<AddressableAssetGroupSchema>();
 
             ContentUpdateGroupSchema contentUpdateGroupSchema = ScriptableObject.CreateInstance<ContentUpdateGroupSchema>();
             BundledAssetGroupSchema bundledAssetGroupSchema = ScriptableObject.CreateInstance<BundledAssetGroupSchema>();
 
             bundledAssetGroupSchema.BundleMode = BundledAssetGroupSchema.BundlePackingMode.PackSeparately;
-            
+
             schemas.Add(contentUpdateGroupSchema);
             schemas.Add(bundledAssetGroupSchema);
 

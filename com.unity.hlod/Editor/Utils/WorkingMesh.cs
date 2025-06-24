@@ -5,12 +5,9 @@ using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace Unity.HLODSystem.Utils
-{
-    public static class MeshExtensions
-    {
-        public static WorkingMesh ToWorkingMesh(this Mesh mesh, Allocator allocator)
-        {
+namespace Unity.HLODSystem.Utils{
+    public static class MeshExtensions{
+        public static WorkingMesh ToWorkingMesh(this Mesh mesh, Allocator allocator){
             var bindposes = mesh.bindposes;
             var wm = new WorkingMesh(allocator, mesh.vertexCount, mesh.triangles.Length, mesh.subMeshCount, bindposes.Length);
             mesh.ApplyToWorkingMesh(ref wm, bindposes);
@@ -20,8 +17,7 @@ namespace Unity.HLODSystem.Utils
 
         // Taking bindposes optional parameter is ugly, but saves an additional array allocation if it was already
         // accessed to get the length
-        public static void ApplyToWorkingMesh(this Mesh mesh, ref WorkingMesh wm, Matrix4x4[] bindposes = null)
-        {
+        public static void ApplyToWorkingMesh(this Mesh mesh, ref WorkingMesh wm, Matrix4x4[] bindposes = null){
             wm.indexFormat = mesh.indexFormat;
             wm.vertices = mesh.vertices;
             wm.normals = mesh.normals;
@@ -34,8 +30,7 @@ namespace Unity.HLODSystem.Utils
             wm.boneWeights = mesh.boneWeights;
             wm.bindposes = bindposes ?? mesh.bindposes;
             wm.subMeshCount = mesh.subMeshCount;
-            for (int i = 0; i < mesh.subMeshCount; i++)
-            {
+            for (int i = 0; i < mesh.subMeshCount; i++){
                 wm.SetTriangles(mesh.GetTriangles(i), i);
             }
             wm.name = mesh.name;
@@ -43,12 +38,10 @@ namespace Unity.HLODSystem.Utils
         }
     }
 
-    public class WorkingMesh : IDisposable
-    {
+    public class WorkingMesh(Allocator allocator, int maxVertices, int maxTriangles, int maxSubmeshes, int maxBindposes) : IDisposable{
         private NativeArray<int> m_detector = new NativeArray<int>(1, Allocator.Persistent);
-        
-        enum Channel
-        {
+
+        enum Channel{
             Vertices,
             Normals,
             Tangents,
@@ -64,334 +57,261 @@ namespace Unity.HLODSystem.Utils
         }
 
         const int k_MaxNameSize = 128;
-        
-        public Vector3[] vertices
-        {
-            get
-            {
+
+        public Vector3[] vertices{
+            get{
                 return m_Vertices.Slice(0, vertexCount).ToArray();
             }
-            set
-            {
+            set{
                 vertexCount = value.Length;
                 m_Vertices.Slice(0, vertexCount).CopyFrom(value);
             }
         }
-        NativeArray<Vector3> m_Vertices;
+        NativeArray<Vector3> m_Vertices = new NativeArray<Vector3>(maxVertices, allocator);
 
-        public int vertexCount
-        {
+        public int vertexCount{
             get { return m_Counts[(int)Channel.Vertices]; }
             private set { m_Counts[(int)Channel.Vertices] = value; }
         }
 
-        public int[] triangles
-        {
+        public int[] triangles{
             get { return m_Triangles.Slice(0, trianglesCount).ToArray(); }
-            set
-            {
+            set{
                 subMeshCount = 1;
                 trianglesCount = value.Length;
                 SetTriangles(value, 0);
             }
         }
-        NativeArray<int> m_Triangles;
+        NativeArray<int> m_Triangles = new NativeArray<int>(maxTriangles, allocator);
 
-        int trianglesCount
-        {
+        int trianglesCount{
             get { return m_Counts[(int)Channel.Triangles]; }
             set { m_Counts[(int)Channel.Triangles] = value; }
         }
 
-        public Vector3[] normals
-        {
+        public Vector3[] normals{
             get { return m_Normals.Slice(0, normalsCount).ToArray(); }
-            set
-            {
-                if (value == null || value.Length == 0)
-                {
+            set{
+                if (value == null || value.Length == 0){
                     normalsCount = 0;
-                }
-                else
-                {
+                }else{
                     normalsCount = value.Length;
                     m_Normals.Slice(0, normalsCount).CopyFrom(value);
                 }
             }
         }
-        NativeArray<Vector3> m_Normals;
+        NativeArray<Vector3> m_Normals = new NativeArray<Vector3>(maxVertices, allocator);
 
-        int normalsCount
-        {
+        int normalsCount{
             get { return m_Counts[(int)Channel.Normals]; }
             set { m_Counts[(int)Channel.Normals] = value; }
         }
 
-        public Vector4[] tangents
-        {
+        public Vector4[] tangents{
             get { return m_Tangents.Slice(0, tangentsCount).ToArray(); }
-            set
-            {
+            set{
                 if (value == null || value.Length == 0)
                 {
                     tangentsCount = 0;
-                }
-                else
-                {
+                }else{
                     tangentsCount = value.Length;
                     m_Tangents.Slice(0, tangentsCount).CopyFrom(value);
                 }
             }
         }
-        NativeArray<Vector4> m_Tangents;
+        NativeArray<Vector4> m_Tangents = new NativeArray<Vector4>(maxVertices, allocator);
 
-        int tangentsCount
-        {
+        int tangentsCount{
             get { return m_Counts[(int)Channel.Tangents]; }
             set { m_Counts[(int)Channel.Tangents] = value; }
         }
 
-        public Vector2[] uv
-        {
+        public Vector2[] uv{
             get { return m_UV.Slice(0, uvCount).ToArray(); }
-            set
-            {
-                if (value == null || value.Length == 0)
-                {
+            set{
+                if (value == null || value.Length == 0){
                     uvCount = 0;
-                }
-                else
-                {
+                }else{
                     uvCount = value.Length;
                     m_UV.Slice(0, uvCount).CopyFrom(value);
                 }
             }
         }
-        NativeArray<Vector2> m_UV;
+        NativeArray<Vector2> m_UV = new NativeArray<Vector2>(maxVertices, allocator);
 
-        int uvCount
-        {
+        int uvCount{
             get { return m_Counts[(int)Channel.UV]; }
             set { m_Counts[(int)Channel.UV] = value; }
         }
 
-        public Vector2[] uv2
-        {
+        public Vector2[] uv2{
             get { return m_UV2.Slice(0, uv2Count).ToArray(); }
-            set
-            {
-                if (value == null || value.Length == 0)
-                {
+            set{
+                if (value == null || value.Length == 0){
                     uv2Count = 0;
-                }
-                else
-                {
+                }else{
                     uv2Count = value.Length;
                     m_UV2.Slice(0, uv2Count).CopyFrom(value);
                 }
             }
         }
-        NativeArray<Vector2> m_UV2;
+        NativeArray<Vector2> m_UV2 = new NativeArray<Vector2>(maxVertices, allocator);
 
-        int uv2Count
-        {
+        int uv2Count{
             get { return m_Counts[(int)Channel.UV2]; }
             set { m_Counts[(int)Channel.UV2] = value; }
         }
 
-        public Vector2[] uv3
-        {
+        public Vector2[] uv3{
             get { return m_UV3.Slice(0, uv3Count).ToArray(); }
-            set
-            {
-                if (value == null || value.Length == 0)
-                {
+            set{
+                if (value == null || value.Length == 0){
                     uv3Count = 0;
-                }
-                else
-                {
+                }else{
                     uv3Count = value.Length;
                     m_UV3.Slice(0, uv3Count).CopyFrom(value);
                 }
             }
         }
-        NativeArray<Vector2> m_UV3;
+        NativeArray<Vector2> m_UV3 = new NativeArray<Vector2>(maxVertices, allocator);
 
-        int uv3Count
-        {
+        int uv3Count{
             get { return m_Counts[(int)Channel.UV3]; }
             set { m_Counts[(int)Channel.UV3] = value; }
         }
 
-        public Vector2[] uv4
-        {
+        public Vector2[] uv4{
             get { return m_UV4.Slice(0, uv4Count).ToArray(); }
-            set
-            {
-                if (value == null || value.Length == 0)
-                {
+            set{
+                if (value == null || value.Length == 0){
                     uv4Count = 0;
-                }
-                else
-                {
+                }else{
                     uv4Count = value.Length;
                     m_UV4.Slice(0, uv4Count).CopyFrom(value);
                 }
             }
         }
-        NativeArray<Vector2> m_UV4;
+        NativeArray<Vector2> m_UV4 = new NativeArray<Vector2>(maxVertices, allocator);
 
-        int uv4Count
-        {
+        int uv4Count{
             get { return m_Counts[(int)Channel.UV4]; }
             set { m_Counts[(int)Channel.UV4] = value; }
         }
 
-        public Color[] colors
-        {
+        public Color[] colors{
             get { return m_Colors.Slice(0, colorsCount).ToArray(); }
-            set
-            {
-                if (value == null || value.Length == 0)
-                {
+            set{
+                if (value == null || value.Length == 0){
                     colorsCount = 0;
-                }
-                else
-                {
+                }else{
                     colorsCount = value.Length;
                     m_Colors.Slice(0, colorsCount).CopyFrom(value);
                 }
             }
         }
-        NativeArray<Color> m_Colors;
+        NativeArray<Color> m_Colors = new NativeArray<Color>(maxVertices, allocator);
 
-        int colorsCount
-        {
+        int colorsCount{
             get { return m_Counts[(int)Channel.Colors]; }
             set { m_Counts[(int)Channel.Colors] = value; }
         }
 
-        public Color32[] colors32
-        {
+        public Color32[] colors32{
             get { return colors != null ? colors.Select(c => (Color32)c).ToArray() : null; }
             set { colors = value != null ? value.Select(c => (Color)c).ToArray() : null; }
         }
 
-        public BoneWeight[] boneWeights
-        {
+        public BoneWeight[] boneWeights{
             get { return m_BoneWeights.Slice(0, boneWeightsCount).ToArray(); }
-            set
-            {
-                if (value == null || value.Length == 0)
-                {
+            set{
+                if (value == null || value.Length == 0){
                     boneWeightsCount = 0;
-                }
-                else
-                {
+                }else{
                     boneWeightsCount = value.Length;
                     m_BoneWeights.Slice(0, boneWeightsCount).CopyFrom(value);
                 }
             }
         }
-        NativeArray<BoneWeight> m_BoneWeights;
+        NativeArray<BoneWeight> m_BoneWeights = new NativeArray<BoneWeight>(maxVertices, allocator);
 
-        int boneWeightsCount
-        {
+        int boneWeightsCount{
             get { return m_Counts[(int)Channel.BoneWeights]; }
             set { m_Counts[(int)Channel.BoneWeights] = value; }
         }
 
-        public Matrix4x4[] bindposes
-        {
+        public Matrix4x4[] bindposes{
             get { return m_Bindposes.Slice(0, bindposesCount).ToArray(); }
-            set
-            {
-                if (value == null || value.Length == 0)
-                {
+            set{
+                if (value == null || value.Length == 0){
                     bindposesCount = 0;
-                }
-                else
-                {
+                }else{
                     bindposesCount = value.Length;
                     m_Bindposes.Slice(0, bindposesCount).CopyFrom(value);
                 }
             }
         }
-        NativeArray<Matrix4x4> m_Bindposes;
+        NativeArray<Matrix4x4> m_Bindposes = new NativeArray<Matrix4x4>(maxBindposes, allocator);
 
-        int bindposesCount
-        {
+        int bindposesCount{
             get { return m_Counts[(int)Channel.Bindposes]; }
             set { m_Counts[(int)Channel.Bindposes] = value; }
         }
 
-        public int subMeshCount
-        {
+        public int subMeshCount{
             get { return submeshOffsetCount; }
-            set
-            {
+            set{
                 if (submeshOffsetCount == value)
                     return;
 
                 var previousCount = submeshOffsetCount;
                 submeshOffsetCount = value;
-                for (var i = previousCount; i < submeshOffsetCount; i++)
-                {
+                for (var i = previousCount; i < submeshOffsetCount; i++){
                     // Initialize these offsets to be invalid, so we don't use stale values
                     m_SubmeshOffset[i] = -1;
                 }
             }
         }
-        NativeArray<int> m_SubmeshOffset;
+        NativeArray<int> m_SubmeshOffset = new NativeArray<int>(maxSubmeshes, allocator);
 
-        int submeshOffsetCount
-        {
+        int submeshOffsetCount{
             get { return m_Counts[(int)Channel.SubmeshOffset]; }
             set { m_Counts[(int)Channel.SubmeshOffset] = value; }
         }
 
-        public string name
-        {
+        public string name{
             get { return Encoding.UTF8.GetString(m_Name.ToArray()); }
-            set
-            {
-                if (value == null)
-                    value = string.Empty;
+            set{
+                value ??= string.Empty;
 
                 var bytes = Encoding.UTF8.GetBytes(value);
                 var length = Mathf.Min(bytes.Length, k_MaxNameSize);
                 m_Name.Slice(0, length).CopyFrom(bytes);
             }
         }
-        NativeArray<byte> m_Name;
+        NativeArray<byte> m_Name = new NativeArray<byte>(k_MaxNameSize, allocator);
 
         // This data does not cross the job threshold, so if it needs to be read back, then it will need to be
         // in a NativeArray or some other type of NativeContainer
         public IndexFormat indexFormat { get; set; }
         public Bounds bounds { get; set; }
 
-        NativeArray<int> m_Counts;
+        NativeArray<int> m_Counts = new NativeArray<int>(Enum.GetValues(typeof(Channel)).Length, allocator);
 
         // These are stubbed out for API completeness, but obviously don't do anything
         public void RecalculateBounds() { }
         public void RecalculateNormals() { }
         public void RecalculateTangents() { }
 
-        public void SetTriangles(int[] triangles, int submesh)
-        {
+        public void SetTriangles(int[] triangles, int submesh){
             if (submesh >= subMeshCount)
                 subMeshCount = submesh + 1;
 
             var preSliceLength = m_SubmeshOffset[submesh];
-            if (preSliceLength < 0)
-            {
-                if (submesh > 0)
-                {
+            if (preSliceLength < 0){
+                if (submesh > 0){
                     m_SubmeshOffset[submesh] = trianglesCount;
                     preSliceLength = trianglesCount;
-                }
-                else
-                {
+                }else{
                     m_SubmeshOffset[submesh] = 0;
                     preSliceLength = 0;
                 }
@@ -401,11 +321,9 @@ namespace Unity.HLODSystem.Utils
 
             var postSliceOffset = 0;
             var postSliceLength = 0;
-            if (submesh < subMeshCount - 2) // count of all triangles after submesh
-            {
+            if (submesh < subMeshCount - 2){
                 postSliceOffset = m_SubmeshOffset[submesh + 1];
-                if (postSliceOffset >= 0)
-                {
+                if (postSliceOffset >= 0){
                     postSliceLength = trianglesCount - postSliceOffset;
                     totalCount += postSliceLength;
                 }
@@ -414,8 +332,7 @@ namespace Unity.HLODSystem.Utils
             trianglesCount = totalCount;
 
             // Shift other following triangles up/down
-            if (postSliceOffset > 0)
-            {
+            if (postSliceOffset > 0){
                 var offset = preSliceLength + triangles.Length;
                 m_SubmeshOffset[submesh + 1] = offset;
                 var sourceSlice = new NativeSlice<int>(m_Triangles, postSliceOffset, postSliceLength);
@@ -426,26 +343,22 @@ namespace Unity.HLODSystem.Utils
             m_Triangles.Slice(preSliceLength, triangles.Length).CopyFrom(triangles);
         }
 
-        public int[] GetTriangles(int submesh)
-        {
-            if (submesh < m_SubmeshOffset.Length)
-            {
-                var start = 0;
-                var stop = 0;
+        public int[] GetTriangles(int submesh){
+            if (submesh < m_SubmeshOffset.Length){
+                int start = 0;
+                int stop = 0;
                 GetTriangleRange(submesh, out start, out stop);
-                var length = stop - start;
+                int length = stop - start;
 
                 var slice = new NativeSlice<int>(m_Triangles, start, length);
                 return slice.ToArray();
             }
 
-            return new int[0];
+            return [];
         }
 
-        void GetTriangleRange(int submesh, out int start, out int stop)
-        {
-            if (submesh < m_SubmeshOffset.Length)
-            {
+        void GetTriangleRange(int submesh, out int start, out int stop){
+            if (submesh < m_SubmeshOffset.Length){
                 start = m_SubmeshOffset[submesh];
                 stop = trianglesCount;
                 if (submesh < m_SubmeshOffset.Length - 1)
@@ -459,26 +372,7 @@ namespace Unity.HLODSystem.Utils
             return;
         }
 
-        public WorkingMesh(Allocator allocator, int maxVertices, int maxTriangles, int maxSubmeshes, int maxBindposes) 
-        {
-            m_Counts = new NativeArray<int>(Enum.GetValues(typeof(Channel)).Length, allocator);
-            m_Vertices = new NativeArray<Vector3>(maxVertices, allocator);
-            m_Normals = new NativeArray<Vector3>(maxVertices, allocator);
-            m_Tangents = new NativeArray<Vector4>(maxVertices, allocator);
-            m_UV = new NativeArray<Vector2>(maxVertices, allocator);
-            m_UV2 = new NativeArray<Vector2>(maxVertices, allocator);
-            m_UV3 = new NativeArray<Vector2>(maxVertices, allocator);
-            m_UV4 = new NativeArray<Vector2>(maxVertices, allocator);
-            m_Colors = new NativeArray<Color>(maxVertices, allocator);
-            m_BoneWeights = new NativeArray<BoneWeight>(maxVertices, allocator);
-            m_Bindposes = new NativeArray<Matrix4x4>(maxBindposes, allocator);
-            m_Name = new NativeArray<byte>(k_MaxNameSize, allocator);
-            m_SubmeshOffset = new NativeArray<int>(maxSubmeshes, allocator);
-            m_Triangles = new NativeArray<int>(maxTriangles, allocator);
-        }
-
-        public void Dispose()
-        {
+        public void Dispose(){
             if (m_Counts.IsCreated)
                 m_Counts.Dispose();
 
@@ -524,19 +418,17 @@ namespace Unity.HLODSystem.Utils
             m_detector.Dispose();
         }
 
-        public Mesh ToMesh()
-        {
+        public Mesh ToMesh(){
             Mesh mesh = new Mesh();
             ApplyToMesh(mesh);
             return mesh;
         }
-        
-        public void ApplyToMesh(Mesh mesh)
-        {
+
+        public void ApplyToMesh(Mesh mesh){
             mesh.indexFormat = indexFormat;
             if (vertices.Length > 65535)
                 mesh.indexFormat = IndexFormat.UInt32;
-            
+
             mesh.vertices = vertices;
             mesh.normals = normals;
             mesh.tangents = tangents;
@@ -548,13 +440,12 @@ namespace Unity.HLODSystem.Utils
             mesh.boneWeights = boneWeights;
             mesh.bindposes = bindposes;
             mesh.subMeshCount = subMeshCount;
-            for (int i = 0; i < subMeshCount; i++)
-            {
+            for (int i = 0; i < subMeshCount; i++){
                 mesh.SetTriangles(GetTriangles(i), i);
             }
             mesh.name = name;
             mesh.bounds = bounds;
-            
+
             mesh.RecalculateBounds();
         }
     }

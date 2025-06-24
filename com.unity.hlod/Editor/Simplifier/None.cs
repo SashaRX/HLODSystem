@@ -3,30 +3,19 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Unity.HLODSystem.Simplifier
-{
-    class None : ISimplifier
-    {
+namespace Unity.HLODSystem.Simplifier{
+    class None(SerializableDynamicObject simplifierOptions) : ISimplifier{
         [InitializeOnLoadMethod]
-        static void RegisterType()
-        {
+        static void RegisterType(){
             //This simplifier should be first always.
             SimplifierTypes.RegisterType(typeof(None), -1);
         }
 
-        public None(SerializableDynamicObject simplifierOptions)
-        {
-
-        }
-
-        public IEnumerator Simplify(HLODBuildInfo info)
-        {
+        public IEnumerator Simplify(HLODBuildInfo info){
             yield break;
         }
 
-        public void SimplifyImmidiate(HLODBuildInfo buildInfo)
-        {
-            
+        public void SimplifyImmidiate(HLODBuildInfo buildInfo){
         }
     }
 }
