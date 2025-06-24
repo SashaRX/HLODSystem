@@ -32,6 +32,7 @@ namespace Unity.HLODSystem
         private SerializedProperty m_CullDistanceProperty;
         private SerializedProperty m_MinObjectSizeProperty;
         private SerializedProperty m_TagFilterProperty;
+        private SerializedProperty m_IgnoreNamePatternsProperty;
 
         private LODSlider m_LODSlider;
 
@@ -78,6 +79,7 @@ namespace Unity.HLODSystem
             m_CullDistanceProperty = serializedObject.FindProperty("m_CullDistance");
             m_MinObjectSizeProperty = serializedObject.FindProperty("m_MinObjectSize");
             m_TagFilterProperty = serializedObject.FindProperty("m_TagFilter");
+            m_IgnoreNamePatternsProperty = serializedObject.FindProperty("m_IgnoreNamePatterns");
 
             m_LODSlider = new LODSlider(true, "Cull");
             m_LODSlider.InsertRange("High", m_LODDistanceProperty);
@@ -142,6 +144,7 @@ namespace Unity.HLODSystem
                 m_LODSlider.Draw();
                 EditorGUILayout.PropertyField(m_MinObjectSizeProperty);
                 EditorGUILayout.PropertyField(m_TagFilterProperty, new GUIContent("Tag Filter"));
+                EditorGUILayout.PropertyField(m_IgnoreNamePatternsProperty, new GUIContent("Ignore Name Patterns"), true);
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
 
