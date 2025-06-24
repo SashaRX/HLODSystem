@@ -185,7 +185,7 @@ namespace Unity.HLODSystem{
             if ( onProgress != null) onProgress(0.3f);
 
             int index = 1;
-            List<TexturePacker.TextureAtlas> atlases = packer.GetAllAtlases();
+            TexturePacker.TextureAtlas[] atlases = packer.GetAllAtlases();
             foreach (TexturePacker.TextureAtlas atlas in atlases){
                 Dictionary<string, WorkingTexture> textures = new Dictionary<string, WorkingTexture>();
                 for (int i = 0; i < atlas.Textures.Count; ++i){

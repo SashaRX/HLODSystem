@@ -34,8 +34,8 @@ namespace Unity.HLODSystem{
         /// <param name="rootTransform">The root transform of the HLOD hierarchy.</param>
         /// <param name="info">The HLODBuildInfo containing information about the working objects to combine.</param>
         private void Combine(Transform rootTransform, HLODBuildInfo info){
-            Dictionary<WorkingMaterial.IdentifierType, WorkingMaterial> materialTable = new Dictionary<WorkingMaterial.IdentifierType, WorkingMaterial>();
-            Dictionary<WorkingMaterial.IdentifierType, List<MeshCombiner.CombineInfo>> combineInfos = new Dictionary<WorkingMaterial.IdentifierType, List<MeshCombiner.CombineInfo>>();
+            Dictionary<string, WorkingMaterial> materialTable = new Dictionary<string, WorkingMaterial>();
+            Dictionary<string, List<MeshCombiner.CombineInfo>> combineInfos = new Dictionary<string, List<MeshCombiner.CombineInfo>>();
             Matrix4x4 hlodWorldToLocal = rootTransform.worldToLocalMatrix;
 
             for (int i = 0; i < info.WorkingObjects.Count; ++i){
@@ -66,7 +66,7 @@ namespace Unity.HLODSystem{
             info.WorkingObjects = combinedObjects;
 
             MeshCombiner combiner = new MeshCombiner();
-            foreach (KeyValuePair<WorkingMaterial.IdentifierType, List<MeshCombiner.CombineInfo>> pair in combineInfos){
+            foreach (KeyValuePair<string, List<MeshCombiner.CombineInfo>> pair in combineInfos){
                 WorkingMesh combinedMesh = combiner.CombineMesh(Allocator.Persistent, pair.Value);
                 WorkingObject combinedObject = new WorkingObject(Allocator.Persistent);
                 WorkingMaterial material = materialTable[pair.Key].Clone();
