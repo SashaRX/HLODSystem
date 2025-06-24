@@ -333,8 +333,7 @@ namespace Unity.HLODSystem.Streaming
         }
 
         static bool showFormat = true;
-        public static void OnGUI(SerializableDynamicObject streamingOptions)
-        {
+        public static void OnGUI(SerializableDynamicObject streamingOptions){
 
             dynamic options = streamingOptions;
 
