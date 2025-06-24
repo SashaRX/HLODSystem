@@ -4,12 +4,9 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Unity.HLODSystem.SpaceManager
-{
-    public static class BoundsExtension
-    {
-        public static bool IsPartOf(this Bounds bounds, Bounds target)
-        {
+namespace Unity.HLODSystem.SpaceManager{
+    public static class BoundsExtension{
+        public static bool IsPartOf(this Bounds bounds, Bounds target){
             return (double) bounds.min.x >= (double) target.min.x &&
                    (double) bounds.max.x <= (double) target.max.x &&
                    (double) bounds.min.y >= (double) target.min.y &&
@@ -18,12 +15,10 @@ namespace Unity.HLODSystem.SpaceManager
                    (double) bounds.max.z <= (double) target.max.z;
         }
     }
-    public class QuadTreeSpaceSplitter : ISpaceSplitter
-    {
+    public class QuadTreeSpaceSplitter : ISpaceSplitter{
 
         [InitializeOnLoadMethod]
-        static void RegisterType()
-        {
+        static void RegisterType(){
             SpaceSplitterTypes.RegisterSpaceSplitterType(typeof(QuadTreeSpaceSplitter));
         }
 
@@ -33,20 +28,18 @@ namespace Unity.HLODSystem.SpaceManager
         private float m_subHLODTreeSize;
 
 
-        public QuadTreeSpaceSplitter(SerializableDynamicObject spaceSplitterOptions)
-        {
+        public QuadTreeSpaceSplitter(SerializableDynamicObject spaceSplitterOptions){
             m_looseSizeFromOptions = 0.0f;
 
             m_useSubHLODTree = false;
             m_subHLODTreeSize = 0.0f;
 
-            if (spaceSplitterOptions == null)
-            {
+            if (spaceSplitterOptions == null){
                 return;
             }
 
             dynamic options = spaceSplitterOptions;
-            if(options.LooseSize1 != null)
+            if(options.LooseSize != null)
                 m_looseSizeFromOptions = options.LooseSize;
             if(options.UseSubHLODTree != null)
                 m_useSubHLODTree = options.UseSubHLODTree;
@@ -130,7 +123,6 @@ namespace Unity.HLODSystem.SpaceManager
                         childNodes[i].ParentNode = node;
 						nodeStack.Push(childNodes[i]);
 					}
-
 				}
 			}
 
