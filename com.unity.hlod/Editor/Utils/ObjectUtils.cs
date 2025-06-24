@@ -89,7 +89,7 @@ namespace Unity.HLODSystem.Utils{
                     .ToList();
                 if (patterns.Count > 0){
                     results = results.Where(t =>
-                        patterns.All(p => t.name.ToLowerInvariant().Contains(p) == false)).ToList();
+                        ContainsPatternInParents(t, patterns, root) == false).ToList();
                 }
             }
 
@@ -117,6 +117,30 @@ namespace Unity.HLODSystem.Utils{
 
         private static GameObject GetParent(GameObject go){
             return go.transform.parent.gameObject;
+        }
+
+        private static bool ContainsPattern(string name, List<string> patterns){
+            string lower = name.ToLowerInvariant();
+            for (int i = 0; i < patterns.Count; ++i){
+                if (lower.Contains(patterns[i]))
+                    return true;
+            }
+            return false;
+        }
+
+        private static bool ContainsPatternInParents(GameObject obj, List<string> patterns, GameObject root){
+            GameObject current = obj;
+            while (current != null){
+                if (ContainsPattern(current.name, patterns))
+                    return true;
+                if (current == root)
+                    break;
+                if (current.transform.parent == null)
+                    break;
+                current = current.transform.parent.gameObject;
+            }
+
+            return false;
         }
 
 
