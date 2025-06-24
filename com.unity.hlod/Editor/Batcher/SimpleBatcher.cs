@@ -7,7 +7,12 @@ using Unity.Collections;
 using Unity.HLODSystem.Utils;
 
 namespace Unity.HLODSystem{
-    public class SimpleBatcher(SerializableDynamicObject batcherOptions) : IBatcher{
+    public class SimpleBatcher : IBatcher{
+        private SerializableDynamicObject m_batcherOptions;
+
+        public SimpleBatcher(SerializableDynamicObject batcherOptions){
+            m_batcherOptions = batcherOptions;
+        }
         public enum PackingType{
             White,
             Black,
@@ -20,7 +25,6 @@ namespace Unity.HLODSystem{
         }
 
         private DisposableDictionary<TexturePacker.TextureAtlas, WorkingMaterial> m_createdMaterials = new DisposableDictionary<TexturePacker.TextureAtlas, WorkingMaterial>();
-        private SerializableDynamicObject m_batcherOptions = batcherOptions;
 
 
         [Serializable]
@@ -50,14 +54,23 @@ namespace Unity.HLODSystem{
         }
 
 
-        class MaterialTextureCache(dynamic options) : IDisposable{
-            private NativeArray<int> m_detector = new NativeArray<int>(1, Allocator.Persistent);
-            private List<TextureInfo> m_textureInfoList = options.TextureInfoList;
+        class MaterialTextureCache : IDisposable{
+            private dynamic m_options;
+            private NativeArray<int> m_detector;
+            private List<TextureInfo> m_textureInfoList;
             private DisposableDictionary<string, TexturePacker.MaterialTexture> m_textureCache = new DisposableDictionary<string, TexturePacker.MaterialTexture>();
             private DisposableDictionary<PackingType, WorkingTexture> m_defaultTextures = CreateDefaultTextures();
 
-            private bool m_enableTintColor = options.EnableTintColor;
-            private string m_tintColorName = options.TintColorName;
+            private bool m_enableTintColor;
+            private string m_tintColorName;
+
+            public MaterialTextureCache(dynamic options){
+                m_options = options;
+                m_detector = new NativeArray<int>(1, Allocator.Persistent);
+                m_textureInfoList = options.TextureInfoList;
+                m_enableTintColor = options.EnableTintColor;
+                m_tintColorName = options.TintColorName;
+            }
 
 
             public TexturePacker.MaterialTexture GetMaterialTextures(WorkingMaterial material){
@@ -303,14 +316,14 @@ namespace Unity.HLODSystem{
         }
 
         static class Styles{
-            public static int[] PackTextureSizes =[
+            public static int[] PackTextureSizes = new[] {
                 256, 512, 1024, 2048, 4096
-            ];
+            };
             public static string[] PackTextureSizeNames;
 
-            public static int[] LimitTextureSizes = [
+            public static int[] LimitTextureSizes = new[] {
                 32, 64, 128, 256, 512, 1024
-            ];
+            };
             public static string[] LimitTextureSizeNames;
 
             static Styles(){
