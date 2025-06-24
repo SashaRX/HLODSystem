@@ -38,8 +38,25 @@ namespace Unity.HLODSystem.Utils{
         }
     }
 
-    public class WorkingMesh(Allocator allocator, int maxVertices, int maxTriangles, int maxSubmeshes, int maxBindposes) : IDisposable{
+    public class WorkingMesh : IDisposable{
         private NativeArray<int> m_detector = new NativeArray<int>(1, Allocator.Persistent);
+
+        public WorkingMesh(Allocator allocator, int maxVertices, int maxTriangles, int maxSubmeshes, int maxBindposes){
+            m_Vertices = new NativeArray<Vector3>(maxVertices, allocator);
+            m_Triangles = new NativeArray<int>(maxTriangles, allocator);
+            m_Normals = new NativeArray<Vector3>(maxVertices, allocator);
+            m_Tangents = new NativeArray<Vector4>(maxVertices, allocator);
+            m_UV = new NativeArray<Vector2>(maxVertices, allocator);
+            m_UV2 = new NativeArray<Vector2>(maxVertices, allocator);
+            m_UV3 = new NativeArray<Vector2>(maxVertices, allocator);
+            m_UV4 = new NativeArray<Vector2>(maxVertices, allocator);
+            m_Colors = new NativeArray<Color>(maxVertices, allocator);
+            m_BoneWeights = new NativeArray<BoneWeight>(maxVertices, allocator);
+            m_Bindposes = new NativeArray<Matrix4x4>(maxBindposes, allocator);
+            m_SubmeshOffset = new NativeArray<int>(maxSubmeshes, allocator);
+            m_Name = new NativeArray<byte>(k_MaxNameSize, allocator);
+            m_Counts = new NativeArray<int>(Enum.GetValues(typeof(Channel)).Length, allocator);
+        }
 
         enum Channel{
             Vertices,
@@ -67,7 +84,7 @@ namespace Unity.HLODSystem.Utils{
                 m_Vertices.Slice(0, vertexCount).CopyFrom(value);
             }
         }
-        NativeArray<Vector3> m_Vertices = new NativeArray<Vector3>(maxVertices, allocator);
+        NativeArray<Vector3> m_Vertices;
 
         public int vertexCount{
             get { return m_Counts[(int)Channel.Vertices]; }
@@ -82,7 +99,7 @@ namespace Unity.HLODSystem.Utils{
                 SetTriangles(value, 0);
             }
         }
-        NativeArray<int> m_Triangles = new NativeArray<int>(maxTriangles, allocator);
+        NativeArray<int> m_Triangles;
 
         int trianglesCount{
             get { return m_Counts[(int)Channel.Triangles]; }
@@ -100,7 +117,7 @@ namespace Unity.HLODSystem.Utils{
                 }
             }
         }
-        NativeArray<Vector3> m_Normals = new NativeArray<Vector3>(maxVertices, allocator);
+        NativeArray<Vector3> m_Normals;
 
         int normalsCount{
             get { return m_Counts[(int)Channel.Normals]; }
@@ -119,7 +136,7 @@ namespace Unity.HLODSystem.Utils{
                 }
             }
         }
-        NativeArray<Vector4> m_Tangents = new NativeArray<Vector4>(maxVertices, allocator);
+        NativeArray<Vector4> m_Tangents;
 
         int tangentsCount{
             get { return m_Counts[(int)Channel.Tangents]; }
@@ -137,7 +154,7 @@ namespace Unity.HLODSystem.Utils{
                 }
             }
         }
-        NativeArray<Vector2> m_UV = new NativeArray<Vector2>(maxVertices, allocator);
+        NativeArray<Vector2> m_UV;
 
         int uvCount{
             get { return m_Counts[(int)Channel.UV]; }
@@ -155,7 +172,7 @@ namespace Unity.HLODSystem.Utils{
                 }
             }
         }
-        NativeArray<Vector2> m_UV2 = new NativeArray<Vector2>(maxVertices, allocator);
+        NativeArray<Vector2> m_UV2;
 
         int uv2Count{
             get { return m_Counts[(int)Channel.UV2]; }
@@ -173,7 +190,7 @@ namespace Unity.HLODSystem.Utils{
                 }
             }
         }
-        NativeArray<Vector2> m_UV3 = new NativeArray<Vector2>(maxVertices, allocator);
+        NativeArray<Vector2> m_UV3;
 
         int uv3Count{
             get { return m_Counts[(int)Channel.UV3]; }
@@ -191,7 +208,7 @@ namespace Unity.HLODSystem.Utils{
                 }
             }
         }
-        NativeArray<Vector2> m_UV4 = new NativeArray<Vector2>(maxVertices, allocator);
+        NativeArray<Vector2> m_UV4;
 
         int uv4Count{
             get { return m_Counts[(int)Channel.UV4]; }
@@ -209,7 +226,7 @@ namespace Unity.HLODSystem.Utils{
                 }
             }
         }
-        NativeArray<Color> m_Colors = new NativeArray<Color>(maxVertices, allocator);
+        NativeArray<Color> m_Colors;
 
         int colorsCount{
             get { return m_Counts[(int)Channel.Colors]; }
@@ -232,7 +249,7 @@ namespace Unity.HLODSystem.Utils{
                 }
             }
         }
-        NativeArray<BoneWeight> m_BoneWeights = new NativeArray<BoneWeight>(maxVertices, allocator);
+        NativeArray<BoneWeight> m_BoneWeights;
 
         int boneWeightsCount{
             get { return m_Counts[(int)Channel.BoneWeights]; }
@@ -250,7 +267,7 @@ namespace Unity.HLODSystem.Utils{
                 }
             }
         }
-        NativeArray<Matrix4x4> m_Bindposes = new NativeArray<Matrix4x4>(maxBindposes, allocator);
+        NativeArray<Matrix4x4> m_Bindposes;
 
         int bindposesCount{
             get { return m_Counts[(int)Channel.Bindposes]; }
@@ -271,7 +288,7 @@ namespace Unity.HLODSystem.Utils{
                 }
             }
         }
-        NativeArray<int> m_SubmeshOffset = new NativeArray<int>(maxSubmeshes, allocator);
+        NativeArray<int> m_SubmeshOffset;
 
         int submeshOffsetCount{
             get { return m_Counts[(int)Channel.SubmeshOffset]; }
@@ -288,14 +305,14 @@ namespace Unity.HLODSystem.Utils{
                 m_Name.Slice(0, length).CopyFrom(bytes);
             }
         }
-        NativeArray<byte> m_Name = new NativeArray<byte>(k_MaxNameSize, allocator);
+        NativeArray<byte> m_Name;
 
         // This data does not cross the job threshold, so if it needs to be read back, then it will need to be
         // in a NativeArray or some other type of NativeContainer
         public IndexFormat indexFormat { get; set; }
         public Bounds bounds { get; set; }
 
-        NativeArray<int> m_Counts = new NativeArray<int>(Enum.GetValues(typeof(Channel)).Length, allocator);
+        NativeArray<int> m_Counts;
 
         // These are stubbed out for API completeness, but obviously don't do anything
         public void RecalculateBounds() { }
@@ -354,7 +371,7 @@ namespace Unity.HLODSystem.Utils{
                 return slice.ToArray();
             }
 
-            return [];
+            return Array.Empty<int>();
         }
 
         void GetTriangleRange(int submesh, out int start, out int stop){

@@ -6,7 +6,9 @@ using UnityEditor;
 using UnityEngine;
 
 namespace Unity.HLODSystem.Simplifier{
-    public class UnityMeshSimplifier(SerializableDynamicObject simplifierOptions) : SimplifierBase(simplifierOptions), SimplifierBase{
+    public class UnityMeshSimplifier : SimplifierBase{
+        public UnityMeshSimplifier(SerializableDynamicObject simplifierOptions) : base(simplifierOptions){
+        }
         [InitializeOnLoadMethod]
         static void RegisterType(){
             SimplifierTypes.RegisterType(typeof(UnityMeshSimplifier));

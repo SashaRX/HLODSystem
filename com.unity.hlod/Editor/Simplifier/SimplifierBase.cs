@@ -7,8 +7,12 @@ using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Unity.HLODSystem.Simplifier{
-    public abstract class SimplifierBase(SerializableDynamicObject simplifierOptions) : ISimplifier{
-        private dynamic m_options = simplifierOptions;
+    public abstract class SimplifierBase : ISimplifier{
+        private dynamic m_options;
+
+        protected SimplifierBase(SerializableDynamicObject simplifierOptions){
+            m_options = simplifierOptions;
+        }
 
         public IEnumerator Simplify(HLODBuildInfo buildInfo){
             for (int i = 0; i < buildInfo.WorkingObjects.Count; ++i){
