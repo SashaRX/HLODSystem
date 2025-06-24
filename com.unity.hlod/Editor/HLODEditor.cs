@@ -150,6 +150,7 @@ namespace Unity.HLODSystem
                 EditorGUILayout.PropertyField(m_MinObjectSizeProperty);
                 EditorGUILayout.PropertyField(m_TagFilterProperty, new GUIContent("Tag Filter"));
                 m_IgnoreNamePatternsList.DoLayoutList();
+                EditorGUILayout.PropertyField(m_IgnoreNamePatternsProperty, new GUIContent("Ignore Name Patterns"), true);
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
 
