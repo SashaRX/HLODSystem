@@ -71,6 +71,8 @@ namespace Unity.HLODSystem.Utils{
 
             //Combine several LODGroups and MeshRenderers belonging to Prefab into one.
             //Since the minimum unit of streaming is Prefab, it must be set to the minimum unit.
+                    targets = targets.Where(t =>
+
             HashSet<GameObject> targetsByPrefab = new HashSet<GameObject>();
             for (int ti = 0; ti < targets.Count; ++ti){
                 GameObject targetPrefab = GetCandidatePrefabRoot(root, targets[ti]);
@@ -82,10 +84,8 @@ namespace Unity.HLODSystem.Utils{
                 results = results.Where(t => t.CompareTag(tagFilter)).ToList();
             }
 
-            if (ignoreNamePatterns != null){
-                List<string> patterns = ignoreNamePatterns
-                    .Where(p => !string.IsNullOrEmpty(p))
-                    .Select(p => p.ToLowerInvariant())
+            return results;
+        }
                     .ToList();
                 if (patterns.Count > 0){
                     results = results.Where(t =>
