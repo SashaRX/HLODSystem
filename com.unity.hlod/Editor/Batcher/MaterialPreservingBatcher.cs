@@ -9,7 +9,9 @@ namespace Unity.HLODSystem{
     /// <summary>
     /// A batcher that preserves materials when combining meshes (does not reduce draw calls)
     /// </summary>
-    class MaterialPreservingBatcher(SerializableDynamicObject batcherOptions) : IBatcher{
+    class MaterialPreservingBatcher : IBatcher{
+        public MaterialPreservingBatcher(SerializableDynamicObject batcherOptions){
+        }
         [InitializeOnLoadMethod]
         static void RegisterType(){
             BatcherTypes.RegisterBatcherType(typeof(MaterialPreservingBatcher));

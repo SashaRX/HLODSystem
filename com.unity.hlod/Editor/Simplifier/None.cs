@@ -4,7 +4,9 @@ using UnityEditor;
 using UnityEngine;
 
 namespace Unity.HLODSystem.Simplifier{
-    class None(SerializableDynamicObject simplifierOptions) : ISimplifier{
+    class None : ISimplifier{
+        public None(SerializableDynamicObject simplifierOptions){
+        }
         [InitializeOnLoadMethod]
         static void RegisterType(){
             //This simplifier should be first always.
