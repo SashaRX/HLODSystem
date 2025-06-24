@@ -33,7 +33,7 @@ namespace Unity.HLODSystem.Utils
             return result.ToList();
         }
 
-        public static List<GameObject> HLODTargets(GameObject root, string tagFilter = null)
+        public static List<GameObject> HLODTargets(GameObject root, string tagFilter = null, IEnumerable<string> ignoreNamePatterns = null)
         {
             List<GameObject> targets = new List<GameObject>();
 
@@ -91,6 +91,17 @@ namespace Unity.HLODSystem.Utils
             if (string.IsNullOrEmpty(tagFilter) == false)
             {
                 results = results.Where(t => t.CompareTag(tagFilter)).ToList();
+            }
+
+            if (ignoreNamePatterns != null)
+            {
+                var patterns = ignoreNamePatterns.Where(p => string.IsNullOrEmpty(p) == false)
+                                                .Select(p => p.ToLowerInvariant()).ToList();
+                if (patterns.Count > 0)
+                {
+                    results = results.Where(t =>
+                        patterns.All(p => t.name.ToLowerInvariant().Contains(p) == false)).ToList();
+                }
             }
 
             return results;

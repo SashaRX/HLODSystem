@@ -23,6 +23,8 @@ namespace Unity.HLODSystem
         private float m_MinObjectSize = 0.0f;
         [SerializeField]
         private string m_TagFilter = "";
+        [SerializeField]
+        private List<string> m_IgnoreNamePatterns = new List<string>{"Collider", "NavMesh", "low"};
 
         private Type m_SpaceSplitterType;
         private Type m_BatcherType;
@@ -126,6 +128,11 @@ namespace Unity.HLODSystem
         {
             set { m_MinObjectSize = value; }
             get { return m_MinObjectSize; }
+        }
+
+        public List<string> IgnoreNamePatterns
+        {
+            get { return m_IgnoreNamePatterns; }
         }
 
         public string TagFilter
