@@ -36,42 +36,51 @@ namespace Unity.HLODSystem.DebugWindow{
         public bool HighlightRendered => m_highlightRendered;
 
         private void OnEnable(){
-            // Each editor window contains a root VisualElement object
-            VisualElement root = rootVisualElement;
+            try
+            {
+                // Each editor window contains a root VisualElement object
+                VisualElement root = rootVisualElement;
 
-            MonoScript ms = MonoScript.FromScriptableObject(this);
-            string scriptPath = AssetDatabase.GetAssetPath(ms);
-            string scriptDirectory = Path.GetDirectoryName(scriptPath);
+                MonoScript ms = MonoScript.FromScriptableObject(this);
+                string scriptPath = AssetDatabase.GetAssetPath(ms);
+                string scriptDirectory = Path.GetDirectoryName(scriptPath);
 
-            // Import UXML
-            var visualTree =
-                AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(scriptDirectory + "/HLODDebugWindow.uxml");
+                // Import UXML
+                string uxmlPath = AssetDatabase.GUIDToAssetPath("7ab00d5519499f642ba732834241148a");
+                var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxmlPath);
+                if (visualTree == null)
+                {
+                    Debug.LogError("Cannot find HLODDebugWindow.uxml");
+                    return;
+                }
+                visualTree.CloneTree(root);
 
-            visualTree.CloneTree(root);
+                //Initialize variables
+                m_hlodItemList = root.Q<ListView>("HLODItemList");
 
-            //Initialize variables
-            m_hlodItemList = root.Q<ListView>("HLODItemList");
-
-            UpdateDataList();
+                UpdateDataList();
 
 
-            var serializedObject = new SerializedObject(this);
-            var drawSelectedUI = root.Q<Toggle>("DrawSelected");
-            drawSelectedUI.Bind(serializedObject);
+                var serializedObject = new SerializedObject(this);
+                var drawSelectedUI = root.Q<Toggle>("DrawSelected");
+                drawSelectedUI.Bind(serializedObject);
 
-            var highlightRenderedUI = root.Q<Toggle>("HighlightRendered");
-            highlightRenderedUI.Bind(serializedObject);
+                var highlightRenderedUI = root.Q<Toggle>("HighlightRendered");
+                highlightRenderedUI.Bind(serializedObject);
 
-            m_drawModeUI = root.Q<RadioButtonGroup>("DrawMode");
-            m_drawModeUI.choices = new[]{
-                DrawMode.None.ToString(),
-                DrawMode.RenderOnly.ToString(),
-                DrawMode.All.ToString(),
-            };
-            m_drawModeUI.Bind(serializedObject);
+                m_drawModeUI = root.Q<RadioButtonGroup>("DrawMode");
+                m_drawModeUI.choices = new[]{
+                    DrawMode.None.ToString(),
+                    DrawMode.RenderOnly.ToString(),
+                    DrawMode.All.ToString(),
+                };
+                m_drawModeUI.Bind(serializedObject);
 
-            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
-            SceneView.duringSceneGui += SceneViewOnDuringSceneGui;
+                EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+                SceneView.duringSceneGui += SceneViewOnDuringSceneGui;
+            }catch (Exception e){
+                Debug.LogError($"HLODDebugWindow initialization error: {e}");
+            }
         }
 
         private void OnDisable(){

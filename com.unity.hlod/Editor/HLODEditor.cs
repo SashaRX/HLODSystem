@@ -76,8 +76,18 @@ namespace Unity.HLODSystem{
             m_TagFilterProperty = serializedObject.FindProperty("m_TagFilter");
             m_IgnoreNamePatternsProperty = serializedObject.FindProperty("m_IgnoreNamePatterns");
 
-            m_IgnoreNamePatternsList = new ReorderableList(serializedObject, m_IgnoreNamePatternsProperty, true, true, true, true);
-            m_IgnoreNamePatternsList.drawHeaderCallback = rect => GUI.Label(rect, "Ignore Name Patterns");
+            m_IgnoreNamePatternsList = new ReorderableList(serializedObject, m_IgnoreNamePatternsProperty, true, true, true, true){
+                drawHeaderCallback = rect => GUI.Label(rect, "Ignore Name Patterns"),
+                drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>{
+                        var element = m_IgnoreNamePatternsProperty.GetArrayElementAtIndex(index);
+                        rect.y += 2;
+                        EditorGUI.PropertyField(
+                            new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                            element,
+                            GUIContent.none);
+                    }
+            };
+
 
             m_LODSlider = new LODSlider(true, "Cull");
             m_LODSlider.InsertRange("High", m_LODDistanceProperty);
@@ -104,6 +114,16 @@ namespace Unity.HLODSystem{
         public override void OnInspectorGUI(){
             serializedObject.Update();
             EditorGUI.BeginChangeCheck();
+
+
+            m_IgnoreNamePatternsList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>{
+                var element = m_IgnoreNamePatternsProperty.GetArrayElementAtIndex(index);
+                rect.y += 2;
+                EditorGUI.PropertyField(
+                    new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                    element,
+                    GUIContent.none);
+            };
 
             if (target is not HLOD hlod){
                 EditorGUILayout.LabelField("HLOD is null.");
@@ -135,7 +155,6 @@ namespace Unity.HLODSystem{
                 EditorGUILayout.PropertyField(m_MinObjectSizeProperty);
                 EditorGUILayout.PropertyField(m_TagFilterProperty, new GUIContent("Tag Filter"));
                 m_IgnoreNamePatternsList.DoLayoutList();
-                EditorGUILayout.PropertyField(m_IgnoreNamePatternsProperty, new GUIContent("Ignore Name Patterns"), true);
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
 
@@ -265,8 +284,6 @@ namespace Unity.HLODSystem{
                 destroyButton = Styles.DestroyButtonEnable;
             }
 
-
-
             EditorGUILayout.Space();
 
             GUI.enabled = generateButton == Styles.GenerateButtonEnable;
@@ -284,7 +301,6 @@ namespace Unity.HLODSystem{
             }
 
             GUI.enabled = true;
-
 
             serializedObject.ApplyModifiedProperties();
             isFirstOnGUI = false;
