@@ -89,6 +89,7 @@ namespace Unity.HLODSystem.Utils{
                     .ToList();
                 if (patterns.Count > 0){
                     results = results.Where(t =>
+                        ContainsPatternInParents(t, patterns, root) == false).ToList();
                         ContainsPatternInHierarchy(t, patterns, root) == false).ToList();
                 }
             }
@@ -128,6 +129,7 @@ namespace Unity.HLODSystem.Utils{
             return false;
         }
 
+        private static bool ContainsPatternInParents(GameObject obj, List<string> patterns, GameObject root){
         private static bool ContainsPatternInHierarchy(GameObject obj, List<string> patterns, GameObject root){
             GameObject current = obj;
             while (current != null){
@@ -152,7 +154,6 @@ namespace Unity.HLODSystem.Utils{
                     queue.Enqueue(child);
                 }
             }
-
             return false;
         }
 
