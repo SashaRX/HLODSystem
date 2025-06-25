@@ -13,7 +13,9 @@ namespace Unity.HLODSystem{
         public SimpleBatcher(SerializableDynamicObject batcherOptions){
             m_batcherOptions = batcherOptions;
         }
-        public enum PackingType{
+
+        public enum PackingType
+        {
             White,
             Black,
             Normal,
@@ -38,7 +40,7 @@ namespace Unity.HLODSystem{
             m_createdMaterials.Dispose();
         }
 
-        public void Batch(Transform rootTransform, DisposableList<HLODBuildInfo> targets, Action<float> onProgress){
+        public void Batch(Transform rootTransform, DisposableList<HLODBuildInfo> targets, bool castShadows, Action<float> onProgress){
             dynamic options = m_batcherOptions;
             onProgress?.Invoke(0.0f);
 
@@ -50,7 +52,6 @@ namespace Unity.HLODSystem{
                 onProgress?.Invoke(0.5f + ((float)i / (float)targets.Count) * 0.5f);
 
             }
-
         }
 
 
@@ -265,6 +266,8 @@ namespace Unity.HLODSystem{
             newObj.Name = info.Name;
             newObj.SetMesh(combinedMesh);
             newObj.Materials.Add(newMat);
+
+            newObj.CastShadow = castShadows;
 
             info.WorkingObjects.Dispose();
             info.WorkingObjects = new DisposableList<WorkingObject>();

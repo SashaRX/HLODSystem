@@ -73,6 +73,7 @@ namespace Unity.HLODSystem{
 
                 combinedMesh.name = info.Name + "_Mesh" + pair.Key;
                 combinedObject.Name = info.Name;
+                combinedObject.CastShadow = castShadows;
                 combinedObject.SetMesh(combinedMesh);
                 combinedObject.Materials.Add(material);
 
