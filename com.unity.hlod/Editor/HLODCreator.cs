@@ -173,8 +173,8 @@ namespace Unity.HLODSystem{
                         "There is no SpaceSplitter. Please set the SpaceSplitter.",
                         "OK");
                     yield break;
-
                 }
+
                 List<SpaceNode> rootNodeList = spliter.CreateSpaceTree(bounds, hlod.ChunkSize, hlod.transform, hlodTargets, progress =>{
                     EditorUtility.DisplayProgressBar("Bake HLOD", "Splitting space", progress * 0.25f);
                 });
@@ -193,10 +193,11 @@ namespace Unity.HLODSystem{
                     yield break;
                 }
 
-                for ( int ri = 0; ri < rootNodeList.Count; ++ ri){
+                for (int ri = 0; ri < rootNodeList.Count; ++ri){
                     var rootNode = rootNodeList[ri];
 
-                    using DisposableList<HLODBuildInfo> buildInfos = CreateBuildInfo(hlod, rootNode, hlod.MinObjectSize);
+                    using DisposableList<HLODBuildInfo> buildInfos =
+                        CreateBuildInfo(hlod, rootNode, hlod.MinObjectSize);
                     if (buildInfos.Count == 0 || buildInfos[0].WorkingObjects.Count == 0){
                         continue;
                     }
@@ -206,25 +207,26 @@ namespace Unity.HLODSystem{
                     sw.Start();
 
                     ISimplifier simplifier = (ISimplifier)Activator.CreateInstance(hlod.SimplifierType, new object[] { hlod.SimplifierOptions });
-                    for (int i = 0; i < buildInfos.Count; ++i){
+                    for (int i = 0; i < buildInfos.Count; ++i)
+                    {
                         yield return new BranchCoroutine(simplifier.Simplify(buildInfos[i]));
                     }
 
-                    yield return new WaitForBranches(progress =>{
+                    yield return new WaitForBranches(progress =>
+                    {
                         EditorUtility.DisplayProgressBar("Bake HLOD", "Simplify meshes",
                             0.25f + progress * 0.25f);
                     });
-
                     Debug.Log("[HLOD] Simplify: " + sw.Elapsed.ToString("g"));
                     sw.Reset();
                     sw.Start();
 
-
-                    batcher.Batch(hlod.transform, buildInfos, hlod.CastShadows,
-                        progress => {
-                            EditorUtility.DisplayProgressBar("Bake HLOD", "Generating combined static meshes.",
-                                0.5f + progress * 0.25f);
-                        });
+                    using (IBatcher batcher = (IBatcher)Activator.CreateInstance(hlod.BatcherType, new object[] { hlod.BatcherOptions })){
+                        batcher.Batch(hlod.transform, buildInfos, hlod.CastShadows,
+                            progress =>{
+                                EditorUtility.DisplayProgressBar("Bake HLOD", "Generating combined static meshes.",
+                                    0.5f + progress * 0.25f);
+                            });
                     }
 
                     Debug.Log("[HLOD] Batch: " + sw.Elapsed.ToString("g"));
@@ -243,7 +245,8 @@ namespace Unity.HLODSystem{
                     }
 
                     IStreamingBuilder builder =
-                        (IStreamingBuilder)Activator.CreateInstance(hlod.StreamingType, new object[] { hlod, ri, hlod.StreamingOptions });
+                        (IStreamingBuilder)Activator.CreateInstance(hlod.StreamingType,
+                            new object[] { hlod, ri, hlod.StreamingOptions });
                     builder.Build(rootNode, buildInfos, targetGameObject, hlod.CullDistance, hlod.LODDistance, hlod.CastShadows, false,
                         true,
                         progress =>{
@@ -258,10 +261,8 @@ namespace Unity.HLODSystem{
                 UserDataSerialization(hlod);
                 EditorUtility.SetDirty(hlod);
                 EditorUtility.SetDirty(hlod.gameObject);
-
             }finally{
                 EditorUtility.ClearProgressBar();
-
             }
         }
 
@@ -299,7 +300,7 @@ namespace Unity.HLODSystem{
                 for (int i = 0; i < controllers.Count; ++i){
                     if (controllers[i] == null)
                         continue;
-                    Object.DestroyImmediate(controllers[i]);
+                    Object.DestroyImmediate(controllrs[i]);
                 }
             }finally{
                 EditorUtility.ClearProgressBar();
