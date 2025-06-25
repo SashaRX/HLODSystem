@@ -1229,7 +1229,7 @@ namespace Unity.HLODSystem
                                         new object[] { m_hlod, m_hlod.StreamingOptions });
 
                                 builder.Build(rootNode, buildInfos, m_hlod.gameObject, m_hlod.CullDistance,
-                                    m_hlod.LODDistance, true, false,
+                                    m_hlod.LODDistance, m_hlod.CastShadows, true, false,
                                     progress =>
                                     {
                                         EditorUtility.DisplayProgressBar("Bake HLOD", "Storing results.",

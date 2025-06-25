@@ -22,6 +22,8 @@ namespace Unity.HLODSystem
         [SerializeField]
         private float m_MinObjectSize = 0.0f;
         [SerializeField]
+        private bool m_castShadows = true;
+        [SerializeField]
         private string m_TagFilter = "";
         [SerializeField]
         private List<string> m_IgnoreNamePatterns = new List<string>{"Collider", "NavMesh", "low"};
@@ -142,7 +144,14 @@ namespace Unity.HLODSystem
         }
 
         
+        public bool CastShadows
+        {
+            get { return m_castShadows; }
+            set { m_castShadows = value; }
+        }
+
 #if UNITY_EDITOR
+
         public List<Object> GeneratedObjects
         {
             get { return m_generatedObjects; }

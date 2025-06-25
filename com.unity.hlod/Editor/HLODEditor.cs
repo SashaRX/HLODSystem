@@ -75,6 +75,7 @@ namespace Unity.HLODSystem{
             m_MinObjectSizeProperty = serializedObject.FindProperty("m_MinObjectSize");
             m_TagFilterProperty = serializedObject.FindProperty("m_TagFilter");
             m_IgnoreNamePatternsProperty = serializedObject.FindProperty("m_IgnoreNamePatterns");
+            m_CastShadowsProperty = serializedObject.FindProperty("m_castShadows");
 
             m_IgnoreNamePatternsList = new ReorderableList(serializedObject, m_IgnoreNamePatternsProperty, true, true, true, true){
                 drawHeaderCallback = rect => GUI.Label(rect, "Ignore Name Patterns"),
@@ -155,6 +156,7 @@ namespace Unity.HLODSystem{
                 EditorGUILayout.PropertyField(m_MinObjectSizeProperty);
                 EditorGUILayout.PropertyField(m_TagFilterProperty, new GUIContent("Tag Filter"));
                 m_IgnoreNamePatternsList.DoLayoutList();
+                EditorGUILayout.PropertyField(m_CastShadowsProperty, new GUIContent("Cast Shadows"));
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
 
