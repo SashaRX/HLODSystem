@@ -29,8 +29,6 @@ namespace Unity.HLODSystem.Utils{
         }
 
         public static List<GameObject> HLODTargets(GameObject root, string tagFilter = null, IEnumerable<string> ignoreNamePatterns = null){
-            DisableRenderersWithNamePatterns(root, ignoreNamePatterns);
-
             List<GameObject> targets = new List<GameObject>();
 
             List<HLODMeshSetter> meshSetters = GetComponentsInChildren<HLODMeshSetter>(root);
@@ -82,6 +80,17 @@ namespace Unity.HLODSystem.Utils{
             List<GameObject> results = targetsByPrefab.ToList();
             if (string.IsNullOrEmpty(tagFilter) == false){
                 results = results.Where(t => t.CompareTag(tagFilter)).ToList();
+            }
+
+            if (ignoreNamePatterns != null){
+                List<string> patterns = ignoreNamePatterns
+                    .Where(p => !string.IsNullOrEmpty(p))
+                    .Select(p => p.ToLowerInvariant())
+                    .ToList();
+                if (patterns.Count > 0){
+                    results = results.Where(t =>
+                        ContainsPatternInHierarchy(t, patterns, root) == false).ToList();
+                }
             }
 
             return results;
@@ -145,50 +154,6 @@ namespace Unity.HLODSystem.Utils{
             }
 
             return false;
-        }
-
-        public static void DisableRenderersWithNamePatterns(GameObject root, IEnumerable<string> patterns)
-        {
-            if (patterns == null)
-                return;
-
-            List<string> lowerPatterns = patterns
-                .Where(p => !string.IsNullOrEmpty(p))
-                .Select(p => p.ToLowerInvariant())
-                .ToList();
-
-            if (lowerPatterns.Count == 0)
-                return;
-
-            Queue<GameObject> queue = new Queue<GameObject>();
-            queue.Enqueue(root);
-            while (queue.Count > 0)
-            {
-                GameObject go = queue.Dequeue();
-                string lowerName = go.name.ToLowerInvariant();
-                bool matched = false;
-                for (int i = 0; i < lowerPatterns.Count; ++i)
-                {
-                    if (lowerName.Contains(lowerPatterns[i]))
-                    {
-                        matched = true;
-                        break;
-                    }
-                }
-                if (matched)
-                {
-                    Renderer[] rs = go.GetComponents<Renderer>();
-                    for (int r = 0; r < rs.Length; ++r)
-                    {
-                        rs[r].enabled = false;
-                    }
-                }
-
-                foreach (Transform child in go.transform)
-                {
-                    queue.Enqueue(child.gameObject);
-                }
-            }
         }
 
 
