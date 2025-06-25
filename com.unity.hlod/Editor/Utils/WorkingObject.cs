@@ -27,6 +27,7 @@ namespace Unity.HLODSystem.Utils
         private Allocator m_allocator;
 
         private UnityEngine.Rendering.LightProbeUsage m_lightProbeUsage;
+        private bool m_castShadow = true;
 
         public string Name { set; get; }
         public WorkingMesh Mesh
@@ -48,6 +49,12 @@ namespace Unity.HLODSystem.Utils
         {
             get => m_lightProbeUsage;
             set => m_lightProbeUsage = value;
+        }
+
+        public bool CastShadow
+        {
+            get => m_castShadow;
+            set => m_castShadow = value;
         }
 
         public WorkingObject(Allocator allocator)
@@ -79,6 +86,7 @@ namespace Unity.HLODSystem.Utils
             m_localToWorld = renderer.localToWorldMatrix;
 
             m_lightProbeUsage = renderer.lightProbeUsage;
+            m_castShadow = renderer.shadowCastingMode != UnityEngine.Rendering.ShadowCastingMode.Off;
         }
 
         public void SetMesh(WorkingMesh mesh)

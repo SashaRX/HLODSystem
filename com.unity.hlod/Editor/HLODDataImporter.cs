@@ -108,6 +108,7 @@ namespace Unity.HLODSystem{
                         mf.sharedMesh = mesh;
                         mr.sharedMaterials = materials.ToArray();
                         mr.lightProbeUsage = so.LightProbeUsage;
+                        mr.shadowCastingMode = so.CastShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off;
 
                         ctx.AddObjectToAsset(mesh.name, mesh);
 

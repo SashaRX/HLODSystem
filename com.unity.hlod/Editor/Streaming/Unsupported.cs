@@ -69,7 +69,7 @@ namespace Unity.HLODSystem.Streaming
         }
 
         public void Build(SpaceNode rootNode, DisposableList<HLODBuildInfo> infos, GameObject root,
-            float cullDistance, float lodDistance, bool writeNoPrefab, bool extractMaterial, Action<float> onProgress)
+            float cullDistance, float lodDistance, bool castShadows, bool writeNoPrefab, bool extractMaterial, Action<float> onProgress)
         {
             dynamic options = m_streamingOptions;
             string path = options.OutputDirectory;
@@ -101,7 +101,7 @@ namespace Unity.HLODSystem.Streaming
 
                 for (int i = 0; i < infos.Count; ++i)
                 {
-                    data.AddFromWokringObjects(infos[i].Name, infos[i].WorkingObjects);
+                    data.AddFromWokringObjects(infos[i].Name, infos[i].WorkingObjects, castShadows);
                     data.AddFromWorkingColliders(infos[i].Name, infos[i].Colliders);
                     if (onProgress != null)
                         onProgress((float) i / (float) infos.Count);
@@ -117,7 +117,7 @@ namespace Unity.HLODSystem.Streaming
                         {
                             if (PrefabUtility.IsAnyPrefabInstanceRoot(spaceNode.Objects[oi]) == false)
                             {
-                                data.AddFromGameObject(spaceNode.Objects[oi]);
+                                data.AddFromGameObject(spaceNode.Objects[oi], castShadows);
                             }
                         }
                     }

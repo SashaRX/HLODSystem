@@ -308,6 +308,7 @@ namespace Unity.HLODSystem
             [SerializeField] private List<string> m_materialIds = new List<string>();
             [SerializeField] private List<string> m_materialNames = new List<string>();
             [SerializeField] private LightProbeUsage m_lightProbeUsage;
+            [SerializeField] private bool m_castShadows = true;
 
             public string Name
             {
@@ -316,6 +317,7 @@ namespace Unity.HLODSystem
             }
 
             public LightProbeUsage LightProbeUsage => m_lightProbeUsage;
+            public bool CastShadows { get => m_castShadows; set => m_castShadows = value; }
 
             public SerializableMesh GetMesh()
             {
@@ -339,6 +341,7 @@ namespace Unity.HLODSystem
                 m_materialIds = new List<string>();
                 m_materialNames = new List<string>();
                 m_lightProbeUsage = obj.LightProbeUsage;
+                m_castShadows = obj.CastShadow;
                 for (int i = 0; i < obj.Materials.Count; ++i)
                 {
                     m_materialIds.Add(obj.Materials[i].Guid);
@@ -588,13 +591,14 @@ namespace Unity.HLODSystem
         [SerializeField] private List<SerializableMaterial> m_materials = new List<SerializableMaterial>();
         [SerializeField] private List<SerializableCollider> m_colliders = new List<SerializableCollider>();
 
-        public void AddFromWokringObjects(string name, IList<WorkingObject> woList)
+        public void AddFromWokringObjects(string name, IList<WorkingObject> woList, bool castShadows)
         {
             for (int i = 0; i < woList.Count; ++i)
             {
                 WorkingObject wo = woList[i];
                 SerializableObject so = new SerializableObject();
                 so.From(wo);
+                so.CastShadows = castShadows;
                 m_objects.Add(so);
 
                 AddFromWorkingMaterials(wo.Materials);
@@ -612,7 +616,7 @@ namespace Unity.HLODSystem
                 m_colliders.Add(sc);
             }
         }
-        public void AddFromGameObject(GameObject go)
+        public void AddFromGameObject(GameObject go, bool castShadows)
         {
             using (WorkingObject wo = new WorkingObject(Allocator.Temp))
             {
@@ -625,6 +629,7 @@ namespace Unity.HLODSystem
 
                 SerializableObject so = new SerializableObject();
                 so.From(wo);
+                so.CastShadows = castShadows;
 
                 for (int mi = 0; mi < wo.Materials.Count; ++mi)
                 {
