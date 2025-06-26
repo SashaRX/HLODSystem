@@ -12,6 +12,7 @@ namespace Unity.HLODSystem{
     class MaterialPreservingBatcher : IBatcher{
         public MaterialPreservingBatcher(SerializableDynamicObject batcherOptions){
         }
+
         [InitializeOnLoadMethod]
         static void RegisterType(){
             BatcherTypes.RegisterBatcherType(typeof(MaterialPreservingBatcher));
@@ -20,12 +21,11 @@ namespace Unity.HLODSystem{
         public void Dispose(){
         }
 
-        public void Batch(Transform rootTransform, DisposableList<HLODBuildInfo> targets, Action<float> onProgress){
+        public void Batch(Transform rootTransform, DisposableList<HLODBuildInfo> targets, bool castShadows, Action<float> onProgress){
             for (int i = 0; i < targets.Count; ++i){
-                Combine(rootTransform, targets[i]);
+                Combine(rootTransform, targets[i], castShadows);
                 onProgress?.Invoke((float)i / (float)targets.Count);
             }
-
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Unity.HLODSystem{
         /// </summary>
         /// <param name="rootTransform">The root transform of the HLOD hierarchy.</param>
         /// <param name="info">The HLODBuildInfo containing information about the working objects to combine.</param>
-        private void Combine(Transform rootTransform, HLODBuildInfo info){
+        private void Combine(Transform rootTransform, HLODBuildInfo info, bool castShadows){
             Dictionary<string, WorkingMaterial> materialTable = new Dictionary<string, WorkingMaterial>();
             Dictionary<string, List<MeshCombiner.CombineInfo>> combineInfos = new Dictionary<string, List<MeshCombiner.CombineInfo>>();
             Matrix4x4 hlodWorldToLocal = rootTransform.worldToLocalMatrix;

@@ -30,6 +30,8 @@ namespace Unity.HLODSystem{
         private SerializedProperty m_MinObjectSizeProperty;
         private SerializedProperty m_TagFilterProperty;
         private SerializedProperty m_IgnoreNamePatternsProperty;
+
+        private SerializedProperty m_CastShadowsProperty;
         private ReorderableList m_IgnoreNamePatternsList;
 
         private LODSlider m_LODSlider;

@@ -300,7 +300,7 @@ namespace Unity.HLODSystem{
                 for (int i = 0; i < controllers.Count; ++i){
                     if (controllers[i] == null)
                         continue;
-                    Object.DestroyImmediate(controllrs[i]);
+                    Object.DestroyImmediate(controllers[i]);
                 }
             }finally{
                 EditorUtility.ClearProgressBar();

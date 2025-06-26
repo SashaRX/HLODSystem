@@ -48,7 +48,7 @@ namespace Unity.HLODSystem{
             PackingTexture(packer, targets, options, onProgress);
 
             for (int i = 0; i < targets.Count; ++i){
-                Combine(rootTransform, packer, targets[i], options);
+                Combine(rootTransform, packer, targets[i], options, castShadows);
                 onProgress?.Invoke(0.5f + ((float)i / (float)targets.Count) * 0.5f);
 
             }
@@ -226,7 +226,7 @@ namespace Unity.HLODSystem{
             return material;
         }
 
-        private void Combine(Transform rootTransform, TexturePacker packer, HLODBuildInfo info, dynamic options){
+        private void Combine(Transform rootTransform, TexturePacker packer, HLODBuildInfo info, dynamic options, bool castShadows){
             TexturePacker.TextureAtlas atlas = packer.GetAtlas(info);
             if (atlas == null)
                 return;

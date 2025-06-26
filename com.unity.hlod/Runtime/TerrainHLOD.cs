@@ -33,12 +33,15 @@ namespace Unity.HLODSystem
         [SerializeField] private string m_albedoPropertyName = "";
         [SerializeField] private string m_normalPropertyName = "";
         [SerializeField] private string m_maskPropertyName = "";
-        
+
         [SerializeField]
         private List<Object> m_generatedObjects = new List<Object>();
         [SerializeField]
         private List<GameObject> m_convertedPrefabObjects = new List<GameObject>();
-        
+
+        [SerializeField]
+        private bool m_castShadows = true;
+
         public Type SimplifierType
         {
             set { m_SimplifierType = value; }
@@ -84,7 +87,7 @@ namespace Unity.HLODSystem
             get { return m_CullDistance; }
             set { m_CullDistance = value; }
         }
-        
+
         public SerializableDynamicObject SimplifierOptions
         {
             get { return m_SimplifierOptions; }
@@ -142,7 +145,7 @@ namespace Unity.HLODSystem
             set { m_maskPropertyName = value; }
             get { return m_maskPropertyName; }
         }
-        
+
         public List<Object> GeneratedObjects
         {
             get { return m_generatedObjects; }
@@ -151,7 +154,12 @@ namespace Unity.HLODSystem
         {
             get { return m_convertedPrefabObjects; }
         }
-        
+
+        public bool CastShadows {
+            get { return m_castShadows; }
+            set { m_castShadows = value; }
+        }
+
         public void OnBeforeSerialize()
         {
             if (m_SimplifierType != null)
@@ -196,7 +204,7 @@ namespace Unity.HLODSystem
         {
             m_convertedPrefabObjects.Add(obj);
         }
-        
+
         public Bounds GetBounds()
         {
             if ( m_TerrainData == null )
