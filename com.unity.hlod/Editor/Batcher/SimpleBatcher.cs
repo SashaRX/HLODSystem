@@ -14,8 +14,7 @@ namespace Unity.HLODSystem{
             m_batcherOptions = batcherOptions;
         }
 
-        public enum PackingType
-        {
+        public enum PackingType{
             White,
             Black,
             Normal,
@@ -27,7 +26,6 @@ namespace Unity.HLODSystem{
         }
 
         private DisposableDictionary<TexturePacker.TextureAtlas, WorkingMaterial> m_createdMaterials = new DisposableDictionary<TexturePacker.TextureAtlas, WorkingMaterial>();
-
 
         [Serializable]
         public class TextureInfo{
@@ -53,7 +51,6 @@ namespace Unity.HLODSystem{
 
             }
         }
-
 
         class MaterialTextureCache : IDisposable{
             private dynamic m_options;
@@ -195,7 +192,6 @@ namespace Unity.HLODSystem{
                     if (textureInfoList[i].Type == PackingType.Normal){
                         wt.Linear = true;
                     }
-
                     textures.Add(textureInfoList[i].OutputName, wt);
                 }
 

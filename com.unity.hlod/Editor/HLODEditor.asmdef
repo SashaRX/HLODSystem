@@ -3,7 +3,8 @@
     "rootNamespace": "",
     "references": [
         "HLOD",
-        "UnityMeshSimplifier"
+        "UnityMeshSimplifier",
+        "Unity.Formats.Fbx.Editor"
     ],
     "includePlatforms": [
         "Editor"

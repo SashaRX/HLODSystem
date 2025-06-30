@@ -1,24 +1,29 @@
-namespace Unity.HLODSystem.Simplifier{
-    public class ManualSimplifier : ISimplifier{
+using System.Collections;
+using UnityEditor;
+using UnityEngine;
+
+namespace Unity.HLODSystem.Simplifier {
+    public class ManualSimplifier : ISimplifier {
         public ManualSimplifier(SerializableDynamicObject simplifierOptions) { }
 
         [InitializeOnLoadMethod]
-        static void RegisterType(){
+        static void RegisterType() {
             SimplifierTypes.RegisterType(typeof(ManualSimplifier), 100);
         }
 
-        public IEnumerator Simplify(HLODBuildInfo buildInfo){
-            // Пропускаем упрощение - меши остаются как есть
+        public IEnumerator Simplify(HLODBuildInfo buildInfo) {
+            // Пропускаем автоматическое упрощение
             yield break;
         }
 
-        public void SimplifyImmidiate(HLODBuildInfo buildInfo){
-            // Ничего не делаем
+        public void SimplifyImmidiate(HLODBuildInfo buildInfo) {
+            // Не выполняем упрощение
         }
 
-        public static void OnGUI(SerializableDynamicObject simplifierOptions){
+        public static void OnGUI(SerializableDynamicObject simplifierOptions) {
             EditorGUILayout.HelpBox(
-                "This simplifier does nothing. Meshes will be used as-is from the batcher.",
+                "Manual simplification mode.\n" +
+                "Meshes will be exported without automatic simplification.",
                 MessageType.Info);
         }
     }

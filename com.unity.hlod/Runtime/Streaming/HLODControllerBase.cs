@@ -17,7 +17,7 @@ namespace Unity.HLODSystem.Streaming
         #if UNITY_EDITOR
         public abstract GameObject GetHighSceneObject(int id);
         #endif
-        
+
         public abstract void Install();
 
 
@@ -29,12 +29,12 @@ namespace Unity.HLODSystem.Streaming
 
         public abstract void LoadHighObject(int id,Action<GameObject> loadDoneCallback);
         public abstract void LoadLowObject(int id, Action<GameObject> loadDoneCallback);
-        
+
         public abstract void UnloadHighObject(int id);
         public abstract void UnloadLowObject(int id);
-        
+
         #endregion
-        
+
         #region Unity Events
         public void Awake()
         {
@@ -83,7 +83,7 @@ namespace Unity.HLODSystem.Streaming
                 Callbacks.Clear();
             }
         }
-        
+
         private Dictionary<int, LoadInfo> m_createdHighObjects = new Dictionary<int, LoadInfo>();
         private Dictionary<int, LoadInfo> m_createdLowObjects = new Dictionary<int, LoadInfo>();
 
@@ -164,7 +164,7 @@ namespace Unity.HLODSystem.Streaming
             m_createdLowObjects.Remove(handle.Id);
             LoadManager.Instance.UnloadLowObject(handle);
         }
-        
+
         public void UpdateCull(Camera camera)
         {
             if (m_spaceManager == null)
@@ -178,7 +178,7 @@ namespace Unity.HLODSystem.Streaming
                 m_root.Cull(true);
             else
                 m_root.Cull(false);
-            
+
             m_root.Update(m_controlMode, m_manualLevel.value, m_lodDistance);
         }
 
@@ -212,7 +212,7 @@ namespace Unity.HLODSystem.Streaming
         {
             return m_manualLevel.value;
         }
-        
+
         public int GetMaxManualLevel()
         {
             return m_manualLevel.maxValue;
@@ -239,39 +239,37 @@ namespace Unity.HLODSystem.Streaming
         #region variables
         private ISpaceManager m_spaceManager;
 
-        [SerializeField] 
+        [SerializeField]
         private HLODTreeNodeContainer m_treeNodeContainer;
         [SerializeField]
         private HLODTreeNode m_root;
 
         [SerializeField] private float m_cullDistance;
         [SerializeField] private float m_lodDistance;
-        
+
         [SerializeField]
         private int m_controllerID;
 
-        [SerializeField] 
+        [SerializeField]
         private UserDataSerializerBase m_userDataSerializer;
 
         [SerializeField]
         private Mode m_controlMode = Mode.AutoControl;
         [SerializeField]
-        
+
         private Utils.RangeInt m_manualLevel = new Utils.RangeInt(-1, 10, 0);
 
-        public enum Mode
-        {
+        public enum Mode{
             DisableHLOD,
             ManualControl,
             AutoControl,
-            
         }
 
         public HLODTreeNodeContainer Container
         {
             set
             {
-                m_treeNodeContainer = value; 
+                m_treeNodeContainer = value;
                 UpdateContainer();
             }
             get { return m_treeNodeContainer; }
@@ -299,7 +297,7 @@ namespace Unity.HLODSystem.Streaming
         {
             set
             {
-                m_root = value; 
+                m_root = value;
                 UpdateContainer();
             }
             get { return m_root; }
@@ -320,7 +318,7 @@ namespace Unity.HLODSystem.Streaming
 
         public void OnBeforeSerialize()
         {
-            
+
         }
 
         public void OnAfterDeserialize()
@@ -332,7 +330,7 @@ namespace Unity.HLODSystem.Streaming
         {
             if (m_root == null)
                 return;
-            
+
             m_root.SetContainer(m_treeNodeContainer);
         }
     }
